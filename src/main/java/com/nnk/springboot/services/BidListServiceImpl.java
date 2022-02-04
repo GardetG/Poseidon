@@ -1,6 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.BidListDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.BidListRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,17 +22,24 @@ public class BidListServiceImpl implements BidListService {
     return bidListRepository.findAll()
         .stream()
         .map(bidList -> new BidListDto(
-            bidList.getBidListId(),
-            bidList.getAccount(),
-            bidList.getType(),
-            bidList.getBidQuantity()
+                bidList.getBidListId(),
+                bidList.getAccount(),
+                bidList.getType(),
+                bidList.getBidQuantity()
             )
         ).collect(Collectors.toList());
   }
 
   @Override
-  public BidListDto findById(int id) {
-    return null;
+  public BidListDto findById(int id) throws ResourceNotFoundException {
+    return bidListRepository.findById(id)
+        .map(bidList -> new BidListDto(
+                bidList.getBidListId(),
+                bidList.getAccount(),
+                bidList.getType(),
+                bidList.getBidQuantity()
+            )
+        ).orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
   }
 
   @Override

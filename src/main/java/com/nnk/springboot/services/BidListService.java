@@ -1,6 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.BidListDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ public interface BidListService {
 
   List<BidListDto> findAll();
 
-  BidListDto findById(int id);
+  BidListDto findById(int id) throws ResourceNotFoundException;
 
   void add(BidListDto bidListDto);
 
