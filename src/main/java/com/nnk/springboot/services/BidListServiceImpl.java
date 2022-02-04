@@ -1,7 +1,10 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.BidListDto;
+import com.nnk.springboot.repositories.BidListRepository;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,9 +13,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class BidListServiceImpl implements BidListService {
 
+  @Autowired
+  private BidListRepository bidListRepository;
+
   @Override
   public List<BidListDto> findAll() {
-    return null;
+    return bidListRepository.findAll()
+        .stream()
+        .map(bidList -> new BidListDto(
+            bidList.getBidListId(),
+            bidList.getAccount(),
+            bidList.getType(),
+            bidList.getBidQuantity()
+            )
+        ).collect(Collectors.toList());
   }
 
   @Override
