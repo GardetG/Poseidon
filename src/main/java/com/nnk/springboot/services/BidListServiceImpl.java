@@ -50,8 +50,10 @@ public class BidListServiceImpl implements BidListService {
   }
 
   @Override
-  public void delete(int id) {
-
+  public void delete(int id) throws ResourceNotFoundException {
+    BidList bidListToDelete = bidListRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
+    bidListRepository.delete(bidListToDelete);
   }
 
 }

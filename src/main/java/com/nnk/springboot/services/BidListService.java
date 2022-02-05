@@ -19,6 +19,6 @@ public interface BidListService {
 
   void update(BidListDto bidListDto) throws ResourceNotFoundException;
 
-  void delete(int id);
+  void delete(int id) throws ResourceNotFoundException;
 
 }
