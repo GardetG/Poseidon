@@ -13,10 +13,10 @@ public class BidListMapper {
   }
 
   /**
-   * Map a BidList into DTO.
+   * Map a BidList entity into DTO.
    *
    * @param bidList to map
-   * @return corresponding BidListDto
+   * @return corresponding BidListDto mapped
    */
   public static BidListDto toDto(BidList bidList) {
     return new BidListDto(
@@ -25,6 +25,18 @@ public class BidListMapper {
         bidList.getType(),
         bidList.getBidQuantity()
     );
+  }
+
+  /**
+   * Map a BidListDto into entity.
+   *
+   * @param bidListDto to map from
+   * @param bidList to map into
+   */
+  public static void toEntity(BidListDto bidListDto, BidList bidList) {
+    bidList.setAccount(bidListDto.getAccount());
+    bidList.setType(bidListDto.getType());
+    bidList.setBidQuantity(bidListDto.getBidQuantity());
   }
 
 }

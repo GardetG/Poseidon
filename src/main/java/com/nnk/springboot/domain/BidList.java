@@ -15,9 +15,7 @@ import javax.persistence.Table;
 @Table(name = "bidlist")
 public class BidList {
 
-  private BidList() {
-    // Default constructor for hibernate
-  }
+  public BidList() { }
 
   /**
    * Create an instance of BidList with account, type and bid qantity.

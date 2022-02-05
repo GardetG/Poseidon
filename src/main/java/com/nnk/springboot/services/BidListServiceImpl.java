@@ -36,11 +36,8 @@ public class BidListServiceImpl implements BidListService {
 
   @Override
   public void add(BidListDto bidListDto) {
-    BidList bidListToAdd = new BidList(
-        bidListDto.getAccount(),
-        bidListDto.getType(),
-        bidListDto.getBidQuantity()
-    );
+    BidList bidListToAdd = new BidList();
+    BidListMapper.toEntity(bidListDto, bidListToAdd);
     bidListRepository.save(bidListToAdd);
   }
 
@@ -48,9 +45,7 @@ public class BidListServiceImpl implements BidListService {
   public void update(BidListDto bidListDto) throws ResourceNotFoundException {
     BidList bidListToUpdate = bidListRepository.findById(bidListDto.getBidListId())
         .orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
-    bidListToUpdate.setAccount(bidListDto.getAccount());
-    bidListToUpdate.setType(bidListDto.getType());
-    bidListToUpdate.setBidQuantity(bidListDto.getBidQuantity());
+    BidListMapper.toEntity(bidListDto, bidListToUpdate);
     bidListRepository.save(bidListToUpdate);
   }
 
