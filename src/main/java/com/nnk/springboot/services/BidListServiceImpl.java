@@ -29,9 +29,7 @@ public class BidListServiceImpl implements BidListService {
 
   @Override
   public BidListDto findById(int id) throws ResourceNotFoundException {
-    return bidListRepository.findById(id)
-        .map(BidListMapper::toDto)
-        .orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
+    return BidListMapper.toDto(getOrThrowException(id));
   }
 
   @Override
@@ -43,17 +41,20 @@ public class BidListServiceImpl implements BidListService {
 
   @Override
   public void update(BidListDto bidListDto) throws ResourceNotFoundException {
-    BidList bidListToUpdate = bidListRepository.findById(bidListDto.getBidListId())
-        .orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
+    BidList bidListToUpdate = getOrThrowException(bidListDto.getBidListId());
     BidListMapper.toEntity(bidListDto, bidListToUpdate);
     bidListRepository.save(bidListToUpdate);
   }
 
   @Override
   public void delete(int id) throws ResourceNotFoundException {
-    BidList bidListToDelete = bidListRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
+    BidList bidListToDelete = getOrThrowException(id);
     bidListRepository.delete(bidListToDelete);
+  }
+
+  private BidList getOrThrowException(int id) throws ResourceNotFoundException {
+    return bidListRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
   }
 
 }
