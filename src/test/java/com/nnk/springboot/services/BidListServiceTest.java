@@ -53,10 +53,10 @@ class BidListServiceTest {
     when(bidListRepository.findAll()).thenReturn(Collections.singletonList(bidListTest));
 
     // WHEN
-    List<BidListDto> actualDtos = bidListService.findAll();
+    List<BidListDto> actualDtoList = bidListService.findAll();
 
     // THEN
-    assertThat(actualDtos).usingRecursiveFieldByFieldElementComparator().containsExactly(bidListDtoTest);
+    assertThat(actualDtoList).usingRecursiveFieldByFieldElementComparator().containsExactly(bidListDtoTest);
     verify(bidListRepository, times(1)).findAll();
   }
 
@@ -67,10 +67,10 @@ class BidListServiceTest {
     when(bidListRepository.findAll()).thenReturn(Collections.emptyList());
 
     // WHEN
-    List<BidListDto> actualDtos = bidListService.findAll();
+    List<BidListDto> actualDtoList = bidListService.findAll();
 
     // THEN
-    assertThat(actualDtos).isEmpty();
+    assertThat(actualDtoList).isEmpty();
     verify(bidListRepository, times(1)).findAll();
   }
 
@@ -103,7 +103,7 @@ class BidListServiceTest {
     verify(bidListRepository, times(1)).findById(9);
   }
 
-  @DisplayName("Add a new BidList should persist it in database")
+  @DisplayName("Add a new BidList should persist it into database")
   @Test
   void addTest() {
     // GIVEN
@@ -118,7 +118,7 @@ class BidListServiceTest {
     assertThat(bidListArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedBidList);
   }
 
-  @DisplayName("Update a BidList should persist it in database")
+  @DisplayName("Update a BidList should persist it into database")
   @Test
   void updateTest() throws ResourceNotFoundException {
     // GIVEN
@@ -131,6 +131,7 @@ class BidListServiceTest {
     bidListService.update(updateBidList);
 
     // THEN
+    verify(bidListRepository, times(1)).findById(1);
     verify(bidListRepository, times(1)).save(bidListArgumentCaptor.capture());
     assertThat(bidListArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedBidList);
   }
@@ -150,6 +151,37 @@ class BidListServiceTest {
         .hasMessage("This bidList is not found");
     verify(bidListRepository, times(1)).findById(9);
     verify(bidListRepository, times(0)).save(any(BidList.class));
+  }
+
+  @DisplayName("Delete a BidList should delete it from database")
+  @Test
+  void deleteTest() throws ResourceNotFoundException {
+    // GIVEN
+    when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidListTest));
+
+    // WHEN
+    bidListService.delete(1);
+
+    // THEN
+    verify(bidListRepository, times(1)).findById(1);
+    verify(bidListRepository, times(1)).delete(bidListArgumentCaptor.capture());
+    assertThat(bidListArgumentCaptor.getValue()).isEqualTo(bidListTest);
+  }
+
+  @DisplayName("Delete a BidList when it's not found should throw an exception")
+  @Test
+  void deleteWhenNotFoundTest() {
+    // GIVEN
+    when(bidListRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> bidListService.delete(9))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This bidList is not found");
+    verify(bidListRepository, times(1)).findById(9);
+    verify(bidListRepository, times(0)).delete(any(BidList.class));
   }
 
 }
