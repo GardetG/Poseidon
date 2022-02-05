@@ -1,5 +1,6 @@
 package com.nnk.springboot.services;
 
+import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.dto.BidListDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.BidListRepository;
@@ -35,7 +36,12 @@ public class BidListServiceImpl implements BidListService {
 
   @Override
   public void add(BidListDto bidListDto) {
-
+    BidList bidListToAdd = new BidList(
+        bidListDto.getAccount(),
+        bidListDto.getType(),
+        bidListDto.getBidQuantity()
+    );
+    bidListRepository.save(bidListToAdd);
   }
 
   @Override
