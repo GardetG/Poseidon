@@ -2,17 +2,21 @@ package com.nnk.springboot.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.nnk.springboot.dto.BidListDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.BidListService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,9 +98,9 @@ class BidListControllerTest {
     // WHEN
     mockMvc.perform(post("/bidList/validate")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .param("account","Account Test")
-            .param("type", "Type Test")
-            .param("bidQuantity", String.valueOf(10d))
+            .param("account",expectedDto.getAccount())
+            .param("type", expectedDto.getType())
+            .param("bidQuantity", String.valueOf(expectedDto.getBidQuantity()))
             .with(csrf()))
 
         // THEN
@@ -106,10 +110,9 @@ class BidListControllerTest {
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
 
-  @DisplayName("POST invalid DTO on /bidList/validate should return same view with ")
+  @DisplayName("POST invalid DTO on /bidList/validate should return form view")
   @Test
   void validateWhenInvalidTest() throws Exception {
-
     // WHEN
     mockMvc.perform(post("/bidList/validate")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -127,4 +130,101 @@ class BidListControllerTest {
     verify(bidListService, times(0)).add(any(BidListDto.class));
   }
 
+  @DisplayName("GET /bidList/update should return view")
+  @Test
+  void showUpdateFormTest() throws Exception {
+    // GIVEN
+    BidListDto bidListDto = new BidListDto(1,"Account Test","Type Test",10d);
+    when(bidListService.findById(anyInt())).thenReturn(bidListDto);
+
+    // WHEN
+    mockMvc.perform(get("/bidList/update/1"))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("bidList/update"))
+        .andExpect(model().attributeExists("bidListDto"))
+        .andExpect(model().attribute("bidListDto", bidListDto));
+    verify(bidListService, times(1)).findById(1);
+  }
+
+  @DisplayName("GET /bidList/update when BidList not found should return view with error message")
+  @Test
+  void showUpdateFormWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This bidList is not found")).when(bidListService).findById(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/bidList/update/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/bidList/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(bidListService, times(1)).findById(9);
+  }
+
+  @DisplayName("POST valid DTO on /bidList/update should persist BidList then return view")
+  @Test
+  void updateBidTest() throws Exception {
+    // GIVEN
+    BidListDto expectedDto = new BidListDto(1,"Update Account Test","Update Type Test", 10d);
+
+    // WHEN
+    mockMvc.perform(post("/bidList/update/1")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("account",expectedDto.getAccount())
+            .param("type", expectedDto.getType())
+            .param("bidQuantity", String.valueOf(expectedDto.getBidQuantity()))
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/bidList/list"));
+    verify(bidListService, times(1)).update(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
+  @DisplayName("POST invalid DTO on /bidList/update should return from view")
+  @Test
+  void updateBidWhenInvalidTest() throws Exception {
+    // WHEN
+    mockMvc.perform(post("/bidList/update/1")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("account","Account Test exceed 30 characters")
+            .param("type", "")
+            .param("bidQuantity", String.valueOf(-10d))
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("bidList/update"))
+        .andExpect(model().attributeHasFieldErrors("bidListDto", "account"))
+        .andExpect(model().attributeHasFieldErrors("bidListDto", "type"))
+        .andExpect(model().attributeHasFieldErrors("bidListDto", "bidQuantity"));
+    verify(bidListService, times(0)).update(any(BidListDto.class));
+  }
+
+  @DisplayName("POST DTO on /bidList/update when BidList not found should return view with error message")
+  @Test
+  void updateBidWhenNotFoundTest() throws Exception {
+    // GIVEN
+    BidListDto expectedDto = new BidListDto(9,"Update Account Test","Update Type Test", 10d);
+    doThrow(new ResourceNotFoundException("This bidList is not found")).when(bidListService).update(any(BidListDto.class));
+
+    // WHEN
+    mockMvc.perform(post("/bidList/update/9")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("account",expectedDto.getAccount())
+            .param("type", expectedDto.getType())
+            .param("bidQuantity", String.valueOf(expectedDto.getBidQuantity()))
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/bidList/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(bidListService, times(1)).update(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
 }
