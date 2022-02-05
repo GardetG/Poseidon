@@ -45,8 +45,13 @@ public class BidListServiceImpl implements BidListService {
   }
 
   @Override
-  public void update(BidListDto bidListDto) {
-
+  public void update(BidListDto bidListDto) throws ResourceNotFoundException {
+    BidList bidListToUpdate = bidListRepository.findById(bidListDto.getBidListId())
+        .orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
+    bidListToUpdate.setAccount(bidListDto.getAccount());
+    bidListToUpdate.setType(bidListDto.getType());
+    bidListToUpdate.setBidQuantity(bidListDto.getBidQuantity());
+    bidListRepository.save(bidListToUpdate);
   }
 
   @Override
