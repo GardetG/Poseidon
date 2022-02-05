@@ -7,6 +7,8 @@ import com.nnk.springboot.repositories.BidListRepository;
 import com.nnk.springboot.utils.BidListMapper;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class BidListServiceImpl implements BidListService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(BidListServiceImpl.class);
 
   @Autowired
   private BidListRepository bidListRepository;
@@ -54,7 +58,10 @@ public class BidListServiceImpl implements BidListService {
 
   private BidList getOrThrowException(int id) throws ResourceNotFoundException {
     return bidListRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("This bidList is not found"));
+        .orElseThrow(() -> {
+          LOGGER.error("The BidList with id {} is not found", id);
+          return new ResourceNotFoundException("This bidList is not found");
+        });
   }
 
 }
