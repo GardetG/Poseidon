@@ -2,6 +2,7 @@ package com.nnk.springboot.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,6 +18,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,12 +33,16 @@ class BidListServiceTest {
   @MockBean
   private BidListRepository bidListRepository;
 
+  @Captor
+  ArgumentCaptor<BidList> bidListArgumentCaptor;
+
   private BidList bidListTest;
   private BidListDto bidListDtoTest;
 
   @BeforeEach
   void setUp() {
     bidListTest = new BidList("Account Test", "Type Test", 10d);
+    bidListTest.setBidListId(1);
     bidListDtoTest = new BidListDto(1,"Account Test", "Type Test", 10d);
   }
 
@@ -43,7 +50,6 @@ class BidListServiceTest {
   @Test
   void findAllTest() {
     // GIVEN
-    bidListTest.setBidListId(1);
     when(bidListRepository.findAll()).thenReturn(Collections.singletonList(bidListTest));
 
     // WHEN
@@ -72,7 +78,6 @@ class BidListServiceTest {
   @Test
   void findByIdTest() throws ResourceNotFoundException {
     // GIVEN
-    bidListTest.setBidListId(1);
     when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidListTest));
 
     // WHEN
@@ -97,4 +102,20 @@ class BidListServiceTest {
         .hasMessage("This bidList is not found");
     verify(bidListRepository, times(1)).findById(9);
   }
+
+  @DisplayName("Add a new BidList should persist it in database")
+  @Test
+  void addTest() {
+    // GIVEN
+    BidListDto newBidList = new BidListDto(0,"new Account Test", "new Type Test", 10d);
+    BidList expectedBidList = new BidList("new Account Test", "new Type Test", 10d);
+
+    // WHEN
+    bidListService.add(newBidList);
+
+    // THEN
+    verify(bidListRepository, times(1)).save(bidListArgumentCaptor.capture());
+    assertThat(bidListArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedBidList);
+  }
+
 }
