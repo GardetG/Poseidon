@@ -1,7 +1,7 @@
 package com.nnk.springboot.controllers;
 
-import com.nnk.springboot.domain.CurvePoint;
 import com.nnk.springboot.dto.CurvePointDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.CurvePointService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +43,21 @@ public class CurveController {
   }
 
   @GetMapping("/curvePoint/update/{id}")
-  public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-    // TODO: get CurvePoint by Id and to model then show to the form
+  public String showUpdateForm(@PathVariable("id") Integer id, Model model)
+      throws ResourceNotFoundException {
+    model.addAttribute("curvePointDto", curvePointService.findById(id));
     return "curvePoint/update";
   }
 
   @PostMapping("/curvePoint/update/{id}")
-  public String updateBid(@PathVariable("id") Integer id, @Valid CurvePoint curvePoint,
-                          BindingResult result, Model model) {
-    // TODO: check required fields, if valid call service to update Curve and return Curve list
-    return "redirect:/curvePoint/list";
+  public String updateBid(@PathVariable("id") Integer id, @Valid CurvePointDto curvePointDto,
+                          BindingResult result, Model model) throws ResourceNotFoundException {
+    if (!result.hasErrors()) {
+      curvePointDto.setId(id);
+      curvePointService.update(curvePointDto);
+      return "redirect:/curvePoint/list";
+    }
+    return "curvePoint/update";
   }
 
   @GetMapping("/curvePoint/delete/{id}")
@@ -60,4 +65,5 @@ public class CurveController {
     // TODO: Find Curve by Id and delete the Curve, return to Curve list
     return "redirect:/curvePoint/list";
   }
+
 }
