@@ -1,7 +1,7 @@
 package com.nnk.springboot.services;
 
-import com.nnk.springboot.dto.CurvePointDto;
 import com.nnk.springboot.dto.RatingDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public interface RatingService {
 
   List<RatingDto> findAll();
 
-  RatingDto findById(int id);
+  RatingDto findById(int id) throws ResourceNotFoundException;
 
   void add(RatingDto ratingDto);
 
