@@ -35,7 +35,7 @@ public class CurvePoint {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private Integer id;
-  @Column(name = "CurveId")
+  @Column(name = "curveid")
   private Integer curveId;
   @Column(name = "asofdate")
   private LocalDateTime asOfDate;
