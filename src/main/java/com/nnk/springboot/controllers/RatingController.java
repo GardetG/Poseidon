@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Rating;
+import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.services.RatingService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,16 @@ public class RatingController {
   }
 
   @GetMapping("/rating/add")
-  public String addRatingForm(Rating rating) {
+  public String addRatingForm(RatingDto ratingDto) {
     return "rating/add";
   }
 
   @PostMapping("/rating/validate")
-  public String validate(@Valid Rating rating, BindingResult result, Model model) {
-    // TODO: check data valid and save to db, after saving return Rating list
+  public String validate(@Valid RatingDto ratingDto, BindingResult result, Model model) {
+    if (!result.hasErrors()) {
+      ratingService.add(ratingDto);
+      return "redirect:/rating/list";
+    }
     return "rating/add";
   }
 
