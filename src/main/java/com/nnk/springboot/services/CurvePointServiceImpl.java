@@ -29,9 +29,7 @@ public class CurvePointServiceImpl implements CurvePointService {
 
   @Override
   public CurvePointDto findById(int id) throws ResourceNotFoundException {
-    return curvePointRepository.findById(id)
-        .map(CurvePointMapper::toDto)
-        .orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
+    return CurvePointMapper.toDto(getOrThrowException(id));
   }
 
   @Override
@@ -43,17 +41,19 @@ public class CurvePointServiceImpl implements CurvePointService {
 
   @Override
   public void update(CurvePointDto curvePointDto) throws ResourceNotFoundException {
-    CurvePoint curvePointToUpdate = curvePointRepository.findById(curvePointDto.getId())
-        .orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
+    CurvePoint curvePointToUpdate = getOrThrowException(curvePointDto.getId());
     CurvePointMapper.toEntity(curvePointToUpdate, curvePointDto);
     curvePointRepository.save(curvePointToUpdate);
   }
 
   @Override
   public void delete(int id) throws ResourceNotFoundException {
-    CurvePoint curvePointToDelete = curvePointRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
+    CurvePoint curvePointToDelete = getOrThrowException(id);
     curvePointRepository.delete(curvePointToDelete);
   }
 
+  private CurvePoint getOrThrowException(int id) throws ResourceNotFoundException {
+    return curvePointRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
+  }
 }
