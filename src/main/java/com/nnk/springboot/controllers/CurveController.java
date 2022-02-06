@@ -50,7 +50,7 @@ public class CurveController {
   }
 
   @PostMapping("/curvePoint/update/{id}")
-  public String updateBid(@PathVariable("id") Integer id, @Valid CurvePointDto curvePointDto,
+  public String updateCurve(@PathVariable("id") Integer id, @Valid CurvePointDto curvePointDto,
                           BindingResult result, Model model) throws ResourceNotFoundException {
     if (!result.hasErrors()) {
       curvePointDto.setId(id);
