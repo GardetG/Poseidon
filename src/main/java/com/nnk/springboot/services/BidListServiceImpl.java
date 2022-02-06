@@ -48,7 +48,7 @@ public class BidListServiceImpl implements BidListService {
   @Override
   public void add(BidListDto bidListDto) {
     BidList bidListToAdd = new BidList();
-    BidListMapper.toEntity(bidListDto, bidListToAdd);
+    BidListMapper.toEntity(bidListToAdd, bidListDto);
     bidListRepository.save(bidListToAdd);
   }
 
@@ -58,7 +58,7 @@ public class BidListServiceImpl implements BidListService {
   @Override
   public void update(BidListDto bidListDto) throws ResourceNotFoundException {
     BidList bidListToUpdate = getOrThrowException(bidListDto.getBidListId());
-    BidListMapper.toEntity(bidListDto, bidListToUpdate);
+    BidListMapper.toEntity(bidListToUpdate, bidListDto);
     bidListRepository.save(bidListToUpdate);
   }
 

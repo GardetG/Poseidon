@@ -20,11 +20,11 @@ public class BidList {
   /**
    * Create an instance of BidList with account, type and bid qantity.
    *
-   * @param account of the Bid
-   * @param type of the Bid
+   * @param account     of the Bid
+   * @param type        of the Bid
    * @param bidQuantity of the Bid
    */
-  public BidList(String account, String type, double bidQuantity) {
+  public BidList(String account, String type, Double bidQuantity) {
     this.account = account;
     this.type = type;
     this.bidQuantity = bidQuantity;
@@ -39,13 +39,13 @@ public class BidList {
   @Column(name = "type")
   private String type;
   @Column(name = "bidquantity")
-  private double bidQuantity;
+  private Double bidQuantity;
   @Column(name = "askquantity")
-  private double askQuantity;
+  private Double askQuantity;
   @Column(name = "bid")
-  private double bid;
+  private Double bid;
   @Column(name = "ask")
-  private double ask;
+  private Double ask;
   @Column(name = "benchmark")
   private String benchmark;
   @Column(name = "bidlistdate")
@@ -101,11 +101,11 @@ public class BidList {
     this.type = type;
   }
 
-  public double getBidQuantity() {
+  public Double getBidQuantity() {
     return bidQuantity;
   }
 
-  public void setBidQuantity(double bidQuantity) {
+  public void setBidQuantity(Double bidQuantity) {
     this.bidQuantity = bidQuantity;
   }
 

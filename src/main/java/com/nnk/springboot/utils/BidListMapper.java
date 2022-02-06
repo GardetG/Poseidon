@@ -30,10 +30,10 @@ public class BidListMapper {
   /**
    * Map a BidListDto into entity.
    *
-   * @param bidListDto to map from
    * @param bidList to map into
+   * @param bidListDto to map from
    */
-  public static void toEntity(BidListDto bidListDto, BidList bidList) {
+  public static void toEntity(BidList bidList, BidListDto bidListDto) {
     bidList.setAccount(bidListDto.getAccount());
     bidList.setType(bidListDto.getType());
     bidList.setBidQuantity(bidListDto.getBidQuantity());
