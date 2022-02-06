@@ -45,8 +45,13 @@ public class CurvePointServiceImpl implements CurvePointService {
   }
 
   @Override
-  public void update(CurvePointDto curvePointDto) {
-
+  public void update(CurvePointDto curvePointDto) throws ResourceNotFoundException {
+    CurvePoint curvePointToUpdate = curvePointRepository.findById(curvePointDto.getId())
+        .orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
+    curvePointToUpdate.setCurveId(curvePointDto.getCurveId());
+    curvePointToUpdate.setTerm(curvePointDto.getTerm());
+    curvePointToUpdate.setValue(curvePointDto.getValue());
+    curvePointRepository.save(curvePointToUpdate);
   }
 
   @Override
