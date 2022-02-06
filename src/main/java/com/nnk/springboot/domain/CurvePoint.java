@@ -1,15 +1,81 @@
 package com.nnk.springboot.domain;
 
-import org.hibernate.validator.constraints.Length;
+import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
-
+/**
+ * CurvePoint entity with id, curveId, term and value.
+ */
 @Entity
 @Table(name = "curvepoint")
 public class CurvePoint {
-    // TODO: Map columns in data table CURVEPOINT with corresponding java fields
+
+  public CurvePoint() { }
+
+  /**
+   * Create an instance of CurvePoint with curveId, term and value.
+   *
+   * @param curveId of the CurvePoint
+   * @param term    of the CurvePoint
+   * @param value   of the CurvePoint
+   */
+  public CurvePoint(Integer curveId, double term, double value) {
+    this.curveId = curveId;
+    this.term = term;
+    this.value = value;
+  }
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Integer id;
+  @Column(name = "CurveId")
+  private Integer curveId;
+  @Column(name = "asofdate")
+  private LocalDateTime asOfDate;
+  @Column(name = "term")
+  private double term;
+  @Column(name = "value")
+  private double value;
+  @Column(name = "creationdate")
+  private LocalDateTime creationDate;
+
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public Integer getCurveId() {
+    return curveId;
+  }
+
+  public void setCurveId(Integer curveId) {
+    this.curveId = curveId;
+  }
+
+  public double getTerm() {
+    return term;
+  }
+
+  public void setTerm(double term) {
+    this.term = term;
+  }
+
+  public double getValue() {
+    return value;
+  }
+
+  public void setValue(double value) {
+    this.value = value;
+  }
+
 }

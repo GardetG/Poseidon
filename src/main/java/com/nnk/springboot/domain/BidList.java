@@ -20,8 +20,8 @@ public class BidList {
   /**
    * Create an instance of BidList with account, type and bid qantity.
    *
-   * @param account of the Bid
-   * @param type of the Bid
+   * @param account     of the Bid
+   * @param type        of the Bid
    * @param bidQuantity of the Bid
    */
   public BidList(String account, String type, double bidQuantity) {
