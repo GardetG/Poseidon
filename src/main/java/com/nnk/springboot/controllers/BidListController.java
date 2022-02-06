@@ -35,7 +35,7 @@ public class BidListController {
   }
 
   @PostMapping("/bidList/validate")
-  public String validate(@Valid BidListDto bidListDto, BindingResult result, Model model) {
+  public String validate(@Valid BidListDto bidListDto, BindingResult result) {
     if (!result.hasErrors()) {
       bidListService.add(bidListDto);
       return "redirect:/bidList/list";
@@ -57,8 +57,7 @@ public class BidListController {
 
   @PostMapping("/bidList/update/{id}")
   public String updateBid(@PathVariable("id") Integer id, @Valid BidListDto bidListDto,
-                          BindingResult result, Model model,
-                          RedirectAttributes redirectAttributes) {
+                          BindingResult result, RedirectAttributes redirectAttributes) {
     if (!result.hasErrors()) {
       try {
         bidListDto.setBidListId(id);
@@ -73,8 +72,12 @@ public class BidListController {
   }
 
   @GetMapping("/bidList/delete/{id}")
-  public String deleteBid(@PathVariable("id") Integer id, Model model) {
-    // TODO: Find Bid by Id and delete the bid, return to Bid list
+  public String deleteBid(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+    try {
+      bidListService.delete(id);
+    } catch (ResourceNotFoundException e) {
+      redirectAttributes.addFlashAttribute("error", e.getMessage());
+    }
     return "redirect:/bidList/list";
   }
 }
