@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.domain.CurvePoint;
 import com.nnk.springboot.dto.CurvePointDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.CurvePointRepository;
@@ -154,5 +155,37 @@ class CurvePointServiceTest {
     verify(curvePointRepository, times(1)).findById(9);
     verify(curvePointRepository, times(0)).save(any(CurvePoint.class));
   }
+
+  @DisplayName("Delete a CurvePoint should delete it from database")
+  @Test
+  void deleteTest() throws ResourceNotFoundException {
+    // GIVEN
+    when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(curvePointTest));
+
+    // WHEN
+    curvePointService.delete(1);
+
+    // THEN
+    verify(curvePointRepository, times(1)).findById(1);
+    verify(curvePointRepository, times(1)).delete(curvePointArgumentCaptor.capture());
+    assertThat(curvePointArgumentCaptor.getValue()).isEqualTo(curvePointTest);
+  }
+
+  @DisplayName("Delete a CurvePoint when it's not found should throw an exception")
+  @Test
+  void deleteWhenNotFoundTest() {
+    // GIVEN
+    when(curvePointRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> curvePointService.delete(9))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This curvePoint is not found");
+    verify(curvePointRepository, times(1)).findById(9);
+    verify(curvePointRepository, times(0)).delete(any(CurvePoint.class));
+  }
+
 
 }
