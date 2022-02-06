@@ -9,8 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.Rating;
-import com.nnk.springboot.domain.Rating;
-import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.RatingRepository;
@@ -157,4 +155,35 @@ class RatingServiceTest {
     verify(ratingRepository, times(0)).save(any(Rating.class));
   }
 
+  @DisplayName("Delete a Rating should delete it from database")
+  @Test
+  void deleteTest() throws ResourceNotFoundException {
+    // GIVEN
+    when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(ratingTest));
+
+    // WHEN
+    ratingService.delete(1);
+
+    // THEN
+    verify(ratingRepository, times(1)).findById(1);
+    verify(ratingRepository, times(1)).delete(ratingArgumentCaptor.capture());
+    assertThat(ratingArgumentCaptor.getValue()).isEqualTo(ratingTest);
+  }
+
+  @DisplayName("Delete a Rating when it's not found should throw an exception")
+  @Test
+  void deleteWhenNotFoundTest() {
+    // GIVEN
+    when(ratingRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> ratingService.delete(9))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This rating is not found");
+    verify(ratingRepository, times(1)).findById(9);
+    verify(ratingRepository, times(0)).delete(any(Rating.class));
+  }
+  
 }

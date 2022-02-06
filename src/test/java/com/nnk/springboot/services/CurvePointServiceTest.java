@@ -186,5 +186,4 @@ class CurvePointServiceTest {
     verify(curvePointRepository, times(0)).delete(any(CurvePoint.class));
   }
 
-
 }
