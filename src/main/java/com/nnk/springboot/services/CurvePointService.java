@@ -19,6 +19,6 @@ public interface CurvePointService {
 
   void update(CurvePointDto curvePointDto) throws ResourceNotFoundException;
 
-  void delete(int id);
+  void delete(int id) throws ResourceNotFoundException;
 
 }

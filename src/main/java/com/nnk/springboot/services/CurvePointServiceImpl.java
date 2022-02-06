@@ -50,8 +50,10 @@ public class CurvePointServiceImpl implements CurvePointService {
   }
 
   @Override
-  public void delete(int id) {
-
+  public void delete(int id) throws ResourceNotFoundException {
+    CurvePoint curvePointToDelete = curvePointRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
+    curvePointRepository.delete(curvePointToDelete);
   }
 
 }
