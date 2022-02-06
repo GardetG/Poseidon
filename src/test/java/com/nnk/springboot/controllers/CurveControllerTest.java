@@ -165,7 +165,7 @@ class CurveControllerTest {
 
   @DisplayName("POST valid DTO on /curvePoint/update should persist curvePoint then return view")
   @Test
-  void updateBidTest() throws Exception {
+  void updateCurveTest() throws Exception {
     // GIVEN
     CurvePointDto expectedDto = new CurvePointDto(1,20,30d,60d);
 
@@ -186,7 +186,7 @@ class CurveControllerTest {
 
   @DisplayName("POST invalid DTO on /curvePoint/update should return from view")
   @Test
-  void updateBidWhenInvalidTest() throws Exception {
+  void updateCurveWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/curvePoint/update/1")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -204,7 +204,7 @@ class CurveControllerTest {
 
   @DisplayName("POST DTO on /curvePoint/update when curvePoint not found should return view with error message")
   @Test
-  void updateBidWhenNotFoundTest() throws Exception {
+  void updateCurveWhenNotFoundTest() throws Exception {
     // GIVEN
     CurvePointDto expectedDto = new CurvePointDto(9,20,30d,60d);
     doThrow(new ResourceNotFoundException("This curvePoint is not found")).when(curvePointService).update(any(CurvePointDto.class));
@@ -223,6 +223,34 @@ class CurveControllerTest {
         .andExpect(flash().attributeExists("error"));
     verify(curvePointService, times(1)).update(dtoCaptor.capture());
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
+  @DisplayName("GET /curvePoint/delete should delete CurvePoint then return view")
+  @Test
+  void deleteCurveTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/curvePoint/delete/1"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/curvePoint/list"));
+    verify(curvePointService, times(1)).delete(1);
+  }
+
+  @DisplayName("GET /CurvePoint/delete when CurvePoint not found should return view with error message")
+  @Test
+  void deleteCurveWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This CurvePoint is not found")).when(curvePointService).delete(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/curvePoint/delete/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/curvePoint/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(curvePointService, times(1)).delete(9);
   }
 
 }
