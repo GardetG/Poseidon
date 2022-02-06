@@ -23,6 +23,9 @@ public class BidListServiceImpl implements BidListService {
   @Autowired
   private BidListRepository bidListRepository;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<BidListDto> findAll() {
     return bidListRepository.findAll()
@@ -31,11 +34,17 @@ public class BidListServiceImpl implements BidListService {
         .collect(Collectors.toList());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public BidListDto findById(int id) throws ResourceNotFoundException {
     return BidListMapper.toDto(getOrThrowException(id));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void add(BidListDto bidListDto) {
     BidList bidListToAdd = new BidList();
@@ -43,6 +52,9 @@ public class BidListServiceImpl implements BidListService {
     bidListRepository.save(bidListToAdd);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void update(BidListDto bidListDto) throws ResourceNotFoundException {
     BidList bidListToUpdate = getOrThrowException(bidListDto.getBidListId());
@@ -50,6 +62,9 @@ public class BidListServiceImpl implements BidListService {
     bidListRepository.save(bidListToUpdate);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void delete(int id) throws ResourceNotFoundException {
     BidList bidListToDelete = getOrThrowException(id);
