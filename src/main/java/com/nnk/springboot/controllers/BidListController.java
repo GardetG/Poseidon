@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,40 +45,35 @@ public class BidListController {
   }
 
   @GetMapping("/bidList/update/{id}")
-  public String showUpdateForm(@PathVariable("id") Integer id, Model model,
-                               RedirectAttributes redirectAttributes) {
-    try {
-      model.addAttribute("bidListDto", bidListService.findById(id));
-    } catch (ResourceNotFoundException e) {
-      redirectAttributes.addFlashAttribute("error", e.getMessage());
-      return "redirect:/bidList/list";
-    }
+  public String showUpdateForm(@PathVariable("id") Integer id, Model model)
+      throws ResourceNotFoundException {
+    model.addAttribute("bidListDto", bidListService.findById(id));
     return "bidList/update";
   }
 
   @PostMapping("/bidList/update/{id}")
   public String updateBid(@PathVariable("id") Integer id, @Valid BidListDto bidListDto,
-                          BindingResult result, RedirectAttributes redirectAttributes) {
+                          BindingResult result)
+      throws ResourceNotFoundException {
     if (!result.hasErrors()) {
-      try {
-        bidListDto.setBidListId(id);
-        bidListService.update(bidListDto);
-      } catch (ResourceNotFoundException e) {
-        redirectAttributes.addFlashAttribute("error", e.getMessage());
-        return "redirect:/bidList/list";
-      }
+      bidListDto.setBidListId(id);
+      bidListService.update(bidListDto);
       return "redirect:/bidList/list";
     }
     return "bidList/update";
   }
 
   @GetMapping("/bidList/delete/{id}")
-  public String deleteBid(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
-    try {
-      bidListService.delete(id);
-    } catch (ResourceNotFoundException e) {
-      redirectAttributes.addFlashAttribute("error", e.getMessage());
-    }
+  public String deleteBid(@PathVariable("id") Integer id)
+      throws ResourceNotFoundException {
+    bidListService.delete(id);
+    return "redirect:/bidList/list";
+  }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public String handleResourceNotFoundException(ResourceNotFoundException e,
+                                                RedirectAttributes redirectAttributes) {
+    redirectAttributes.addFlashAttribute("error", e.getMessage());
     return "redirect:/bidList/list";
   }
 }
