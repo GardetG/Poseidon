@@ -54,7 +54,7 @@ public class BidListController {
   }
 
   /**
-   * Validate the add BiddList form.
+   * Validate the add BidList form.
    * If form contains errors, show the form view to display fields validation errors.
    * Else, call the service layer to persist BidList and return to BidList list view.
    *
@@ -91,7 +91,7 @@ public class BidListController {
   }
 
   /**
-   * Validate the update BiddList form.
+   * Validate the update BidList form.
    * If form contains errors, show the form view to display fields validation errors.
    * Else, call the service layer to persist BidList and return to BidList list view.
    *
@@ -99,13 +99,13 @@ public class BidListController {
    * @param bidListDto of the form
    * @param result hold validation errors
    * @return View
-   * @throws ResourceNotFoundException when the requested BidList is not found
+   * @throws ResourceNotFoundException when the requested BidList not found
    */
   @PostMapping("/bidList/update/{id}")
   public String updateBid(@PathVariable("id") Integer id, @Valid BidListDto bidListDto,
                           BindingResult result)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update BidList {} form validation", id);
+    LOGGER.info("Request update BidList id {} form validation", id);
     if (!result.hasErrors()) {
       bidListDto.setBidListId(id);
       bidListService.update(bidListDto);
@@ -121,7 +121,7 @@ public class BidListController {
    *
    * @param id of the BidList to delete
    * @return View
-   * @throws ResourceNotFoundException when the requested Bidlist is not found
+   * @throws ResourceNotFoundException when the requested Bidlist not found
    */
   @GetMapping("/bidList/delete/{id}")
   public String deleteBid(@PathVariable("id") Integer id)
@@ -146,4 +146,5 @@ public class BidListController {
     redirectAttributes.addFlashAttribute("error", e.getMessage());
     return "redirect:/bidList/list";
   }
+
 }
