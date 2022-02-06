@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.CurvePoint;
-import com.nnk.springboot.domain.CurvePoint;
 import com.nnk.springboot.dto.CurvePointDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.CurvePointRepository;
@@ -35,7 +34,7 @@ class CurvePointServiceTest {
   private CurvePointRepository curvePointRepository;
 
   @Captor
-  ArgumentCaptor<CurvePoint> curvePointArgumentCaptor;
+  private ArgumentCaptor<CurvePoint> curvePointArgumentCaptor;
 
   private CurvePoint curvePointTest;
   private CurvePointDto curvePointDtoTest;
@@ -186,6 +185,5 @@ class CurvePointServiceTest {
     verify(curvePointRepository, times(1)).findById(9);
     verify(curvePointRepository, times(0)).delete(any(CurvePoint.class));
   }
-
 
 }

@@ -12,3 +12,8 @@ insert into CurvePoint(Id, CurveId, term, value)
     values(1, 10, 10.0, 20.0);
 insert into CurvePoint(Id, CurveId, term, value)
     values(2, 11, 15.0, 30.0);
+
+insert into Rating(Id, moodysRating, sandPRating, fitchRating, orderNumber)
+    values(1, 'Moody Rating Test', 'S&P Rating Test', 'Fitch Rating Test', 10);
+insert into Rating(Id, moodysRating, sandPRating, fitchRating, orderNumber)
+    values(2, 'Moody Rating to delete Test', 'S&P Rating to delete Test', 'Fitch Rating to delete Test', 11);

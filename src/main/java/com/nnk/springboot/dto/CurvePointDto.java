@@ -9,8 +9,7 @@ import javax.validation.constraints.NotNull;
  */
 public class CurvePointDto {
 
-  public CurvePointDto() {
-  }
+  public CurvePointDto() { }
 
   /**
    * Create an instance of the DTO with required fields.

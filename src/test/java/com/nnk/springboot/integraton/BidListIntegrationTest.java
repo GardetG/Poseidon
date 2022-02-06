@@ -112,7 +112,7 @@ class BidListIntegrationTest {
     mockMvc.perform(get("/bidList/delete/2")
             .with(csrf()))
 
-        // THEN
+    // THEN
         .andExpect(status().isFound())
         .andExpect(view().name("redirect:/bidList/list"));
 

@@ -14,10 +14,44 @@
 	</div>
 
 	<div class="row">
-		<form action="#" th:action="@{/rating/update/{id}(id=${rating.id})}" th:object="${rating}" method="post" class="form-horizontal" style="width: 100%">
-			<!--
-			TODO: Create a form to edit the values of Rating, there are 2 buttons: Update data and Cancel to the Rating
-			 -->
+		<form action="#" th:action="@{/rating/update/{id}(id=${ratingDto.id})}" th:object="${ratingDto}" method="post" class="form-horizontal" style="width: 100%">
+
+			<div class="form-group">
+				<label for="moodysRating" class="col-sm-2 control-label">Moody's Rating</label>
+				<div class="col-sm-10">
+					<input type="text" th:field="*{moodysRating}" id="moodysRating" placeholder="Moody's Rating" class="col-4">
+					<p class="text-danger" th:if="${#fields.hasErrors('moodysRating')}" th:errors="*{moodysRating}"></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="sandpRating" class="col-sm-2 control-label">S&P Rating</label>
+				<div class="col-sm-10">
+					<input type="text" th:field="*{sandpRating}" id="sandpRating" placeholder="S&P Rating" class="col-4">
+					<p class="text-danger" th:if="${#fields.hasErrors('sandpRating')}" th:errors="*{sandpRating}"></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="fitchRating" class="col-sm-2 control-label">Fitch Rating</label>
+				<div class="col-sm-10">
+					<input type="text" th:field="*{fitchRating}" id="fitchRating" placeholder="Fitch Rating" class="col-4">
+					<p class="text-danger" th:if="${#fields.hasErrors('fitchRating')}" th:errors="*{fitchRating}"></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="orderNumber" class="col-sm-2 control-label">Order</label>
+				<div class="col-sm-10">
+					<input type="number" th:field="*{orderNumber}" id="orderNumber" placeholder="Order" step="1" class="col-4">
+					<p class="text-danger" th:if="${#fields.hasErrors('orderNumber')}" th:errors="*{orderNumber}"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="col-sm-12">
+					<a class="btn btn-danger btn-sm" href="/rating/list">Cancel</a>
+					<input class="btn btn-primary btn-sm" type="submit" value="Update Rating">
+				</div>
+			</div>
+
 		</form>
 	</div>
 
