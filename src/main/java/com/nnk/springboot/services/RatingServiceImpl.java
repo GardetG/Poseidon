@@ -1,5 +1,6 @@
 package com.nnk.springboot.services;
 
+import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.RatingRepository;
@@ -35,7 +36,13 @@ public class RatingServiceImpl implements RatingService {
 
   @Override
   public void add(RatingDto ratingDto) {
-
+    Rating ratingToAdd = new Rating(
+        ratingDto.getMoodysRating(),
+        ratingDto.getSandpRating(),
+        ratingDto.getFitchRating(),
+        ratingDto.getOrderNumber()
+    );
+    ratingRepository.save(ratingToAdd);
   }
 
   @Override
