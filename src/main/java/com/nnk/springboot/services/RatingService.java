@@ -17,7 +17,7 @@ public interface RatingService {
 
   void add(RatingDto ratingDto);
 
-  void update(RatingDto ratingDto);
+  void update(RatingDto ratingDto) throws ResourceNotFoundException;
 
   void delete(int id);
 

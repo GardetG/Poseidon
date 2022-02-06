@@ -46,8 +46,14 @@ public class RatingServiceImpl implements RatingService {
   }
 
   @Override
-  public void update(RatingDto ratingDto) {
-
+  public void update(RatingDto ratingDto) throws ResourceNotFoundException {
+    Rating ratingToUpdate = ratingRepository.findById(ratingDto.getId())
+        .orElseThrow(() -> new ResourceNotFoundException("This rating is not found"));
+    ratingToUpdate.setMoodysRating(ratingDto.getMoodysRating());
+    ratingToUpdate.setSandpRating(ratingDto.getSandpRating());
+    ratingToUpdate.setFitchRating(ratingDto.getFitchRating());
+    ratingToUpdate.setOrderNumber(ratingDto.getOrderNumber());
+    ratingRepository.save(ratingToUpdate);
   }
 
   @Override
