@@ -7,6 +7,8 @@ import com.nnk.springboot.repositories.RatingRepository;
 import com.nnk.springboot.utils.RatingMapper;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +18,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class RatingServiceImpl implements RatingService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(RatingServiceImpl.class);
+  
   @Autowired
   private RatingRepository ratingRepository;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<RatingDto> findAll() {
     return ratingRepository.findAll()
@@ -27,11 +34,17 @@ public class RatingServiceImpl implements RatingService {
         .collect(Collectors.toList());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public RatingDto findById(int id) throws ResourceNotFoundException {
     return RatingMapper.toDto(getOrThrowException(id));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void add(RatingDto ratingDto) {
     Rating ratingToAdd = new Rating();
@@ -39,6 +52,9 @@ public class RatingServiceImpl implements RatingService {
     ratingRepository.save(ratingToAdd);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void update(RatingDto ratingDto) throws ResourceNotFoundException {
     Rating ratingToUpdate = getOrThrowException(ratingDto.getId());
@@ -46,6 +62,9 @@ public class RatingServiceImpl implements RatingService {
     ratingRepository.save(ratingToUpdate);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void delete(int id) throws ResourceNotFoundException {
     Rating ratingToDelete = getOrThrowException(id);
@@ -54,7 +73,10 @@ public class RatingServiceImpl implements RatingService {
   
   private Rating getOrThrowException(int id) throws ResourceNotFoundException {
     return ratingRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("This rating is not found"));
+        .orElseThrow(() -> {
+          LOGGER.error("The Rating with id {} is not found", id);
+          return new ResourceNotFoundException("This rating is not found");
+        });
   }
   
 }
