@@ -7,7 +7,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.dto.BidListDto;
 import com.nnk.springboot.dto.CurvePointDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.CurvePointRepository;
@@ -17,6 +19,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,6 +33,9 @@ class CurvePointServiceTest {
 
   @MockBean
   private CurvePointRepository curvePointRepository;
+
+  @Captor
+  ArgumentCaptor<CurvePoint> curvePointArgumentCaptor;
 
   private CurvePoint curvePointTest;
   private CurvePointDto curvePointDtoTest;
@@ -97,4 +104,19 @@ class CurvePointServiceTest {
     verify(curvePointRepository, times(1)).findById(9);
   }
 
+  @DisplayName("Add a new CurvePoint should persist it in database")
+  @Test
+  void addTest() {
+    // GIVEN
+    CurvePointDto newCurvePoint = new CurvePointDto(0,10, 10d, 30d);
+    CurvePoint expectedCurvePoint = new CurvePoint(10, 10d, 30d);
+
+    // WHEN
+    curvePointService.add(newCurvePoint);
+
+    // THEN
+    verify(curvePointRepository, times(1)).save(curvePointArgumentCaptor.capture());
+    assertThat(curvePointArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedCurvePoint);
+  }
+  
 }
