@@ -128,7 +128,6 @@ class CurveControllerTest {
     verify(curvePointService, times(0)).add(any(CurvePointDto.class));
   }
 
-
   @DisplayName("GET /curvePoint/update should return view")
   @Test
   void showUpdateFormTest() throws Exception {
