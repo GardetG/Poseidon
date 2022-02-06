@@ -13,7 +13,7 @@ public class BidListDto {
   public BidListDto() { }
 
   /**
-   * Create an instance of the DTO.
+   * Create an instance of the DTO with required fields.
    *
    * @param bidListId   of the DTO
    * @param account     of the DTO
