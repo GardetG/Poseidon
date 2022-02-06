@@ -29,9 +29,7 @@ public class RatingServiceImpl implements RatingService {
 
   @Override
   public RatingDto findById(int id) throws ResourceNotFoundException {
-    return ratingRepository.findById(id)
-        .map(RatingMapper::toDto)
-        .orElseThrow(() -> new ResourceNotFoundException("This rating is not found"));
+    return RatingMapper.toDto(getOrThrowException(id));
   }
 
   @Override
@@ -43,16 +41,20 @@ public class RatingServiceImpl implements RatingService {
 
   @Override
   public void update(RatingDto ratingDto) throws ResourceNotFoundException {
-    Rating ratingToUpdate = ratingRepository.findById(ratingDto.getId())
-        .orElseThrow(() -> new ResourceNotFoundException("This rating is not found"));
+    Rating ratingToUpdate = getOrThrowException(ratingDto.getId());
     RatingMapper.toEntity(ratingToUpdate, ratingDto);
     ratingRepository.save(ratingToUpdate);
   }
 
   @Override
   public void delete(int id) throws ResourceNotFoundException {
-    Rating ratingToDelete = ratingRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("This rating is not found"));
+    Rating ratingToDelete = getOrThrowException(id);
     ratingRepository.delete(ratingToDelete);
   }
+  
+  private Rating getOrThrowException(int id) throws ResourceNotFoundException {
+    return ratingRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This rating is not found"));
+  }
+  
 }
