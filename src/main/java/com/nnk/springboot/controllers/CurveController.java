@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.dto.CurvePointDto;
 import com.nnk.springboot.services.CurvePointService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,16 @@ public class CurveController {
   }
 
   @GetMapping("/curvePoint/add")
-  public String addBidForm(CurvePoint bid) {
+  public String addCurveForm(CurvePointDto curvePointDto) {
     return "curvePoint/add";
   }
 
   @PostMapping("/curvePoint/validate")
-  public String validate(@Valid CurvePoint curvePoint, BindingResult result, Model model) {
-    // TODO: check data valid and save to db, after saving return Curve list
+  public String validate(@Valid CurvePointDto curvePointDto, BindingResult result, Model model) {
+    if (!result.hasErrors()) {
+      curvePointService.add(curvePointDto);
+      return "redirect:/curvePoint/list";
+    }
     return "curvePoint/add";
   }
 
