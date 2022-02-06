@@ -28,4 +28,17 @@ public class RatingMapper {
     );
   }
 
+  /**
+   * Map a RatingDto into entity.
+   *
+   * @param rating to map into
+   * @param ratingDto to map from
+   */
+  public static void toEntity(Rating rating, RatingDto ratingDto) {
+    rating.setMoodysRating(ratingDto.getMoodysRating());
+    rating.setSandpRating(ratingDto.getSandpRating());
+    rating.setFitchRating(ratingDto.getFitchRating());
+    rating.setOrderNumber(ratingDto.getOrderNumber());
+  }
+  
 }
