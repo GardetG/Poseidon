@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class RatingController {
@@ -60,6 +62,13 @@ public class RatingController {
   @GetMapping("/rating/delete/{id}")
   public String deleteRating(@PathVariable("id") Integer id, Model model) {
     // TODO: Find Rating by Id and delete the Rating, return to Rating list
+    return "redirect:/rating/list";
+  }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public String handleResourceNotFoundException(ResourceNotFoundException e,
+                                                RedirectAttributes redirectAttributes) {
+    redirectAttributes.addFlashAttribute("error", e.getMessage());
     return "redirect:/rating/list";
   }
 }
