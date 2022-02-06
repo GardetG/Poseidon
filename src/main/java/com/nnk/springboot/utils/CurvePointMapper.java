@@ -27,4 +27,16 @@ public class CurvePointMapper {
     );
   }
 
+  /**
+   * Map a CurvePointDto into entity.
+   *
+   * @param curvePoint to map into
+   * @param curvePointDto to map from
+   */
+  public static void toEntity(CurvePoint curvePoint, CurvePointDto curvePointDto) {
+    curvePoint.setCurveId(curvePointDto.getCurveId());
+    curvePoint.setTerm(curvePointDto.getTerm());
+    curvePoint.setValue(curvePointDto.getValue());
+  }
+
 }

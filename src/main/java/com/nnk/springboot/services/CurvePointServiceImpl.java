@@ -36,11 +36,8 @@ public class CurvePointServiceImpl implements CurvePointService {
 
   @Override
   public void add(CurvePointDto curvePointDto) {
-    CurvePoint curvePointToAdd = new CurvePoint(
-        curvePointDto.getCurveId(),
-        curvePointDto.getTerm(),
-        curvePointDto.getValue()
-    );
+    CurvePoint curvePointToAdd = new CurvePoint();
+    CurvePointMapper.toEntity(curvePointToAdd, curvePointDto);
     curvePointRepository.save(curvePointToAdd);
   }
 
@@ -48,9 +45,7 @@ public class CurvePointServiceImpl implements CurvePointService {
   public void update(CurvePointDto curvePointDto) throws ResourceNotFoundException {
     CurvePoint curvePointToUpdate = curvePointRepository.findById(curvePointDto.getId())
         .orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
-    curvePointToUpdate.setCurveId(curvePointDto.getCurveId());
-    curvePointToUpdate.setTerm(curvePointDto.getTerm());
-    curvePointToUpdate.setValue(curvePointDto.getValue());
+    CurvePointMapper.toEntity(curvePointToUpdate, curvePointDto);
     curvePointRepository.save(curvePointToUpdate);
   }
 
