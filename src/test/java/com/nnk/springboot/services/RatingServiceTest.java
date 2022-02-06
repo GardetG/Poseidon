@@ -2,12 +2,15 @@ package com.nnk.springboot.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.Rating;
+import com.nnk.springboot.domain.Rating;
+import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.RatingRepository;
@@ -117,5 +120,41 @@ class RatingServiceTest {
     verify(ratingRepository, times(1)).save(ratingArgumentCaptor.capture());
     assertThat(ratingArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedRating);
   }
-  
+
+  @DisplayName("Update a Rating should persist it into database")
+  @Test
+  void updateTest() throws ResourceNotFoundException {
+    // GIVEN
+    RatingDto updateRating = new RatingDto(1, "Update Moodys Rating", "Update S&P Rating", "Update Fitch Rating", 11);
+    Rating expectedRating = new Rating("Update Moodys Rating", "Update S&P Rating", "Update Fitch Rating", 11);
+    expectedRating.setId(1);
+    when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(ratingTest));
+
+    // WHEN
+    ratingService.update(updateRating);
+
+    // THEN
+    verify(ratingRepository, times(1)).findById(1);
+    verify(ratingRepository, times(1)).save(ratingArgumentCaptor.capture());
+    assertThat(ratingArgumentCaptor.getValue()).usingRecursiveComparison()
+        .isEqualTo(expectedRating);
+  }
+
+  @DisplayName("Update a Rating when it's not found should throw an exception")
+  @Test
+  void updateWhenNotFoundTest() {
+    // GIVEN
+    RatingDto updateRating = new RatingDto(9, "Update Moodys Rating", "Update S&P Rating", "Update Fitch Rating", 11);
+    when(ratingRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> ratingService.update(updateRating))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This rating is not found");
+    verify(ratingRepository, times(1)).findById(9);
+    verify(ratingRepository, times(0)).save(any(Rating.class));
+  }
+
 }
