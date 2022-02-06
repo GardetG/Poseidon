@@ -60,8 +60,9 @@ public class RatingController {
   }
 
   @GetMapping("/rating/delete/{id}")
-  public String deleteRating(@PathVariable("id") Integer id, Model model) {
-    // TODO: Find Rating by Id and delete the Rating, return to Rating list
+  public String deleteRating(@PathVariable("id") Integer id, Model model)
+      throws ResourceNotFoundException {
+    ratingService.delete(id);
     return "redirect:/rating/list";
   }
 
@@ -71,4 +72,5 @@ public class RatingController {
     redirectAttributes.addFlashAttribute("error", e.getMessage());
     return "redirect:/rating/list";
   }
+
 }
