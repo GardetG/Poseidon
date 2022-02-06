@@ -1,7 +1,7 @@
 package com.nnk.springboot.controllers;
 
-import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.dto.RatingDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.RatingService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,16 +40,21 @@ public class RatingController {
   }
 
   @GetMapping("/rating/update/{id}")
-  public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-    // TODO: get Rating by Id and to model then show to the form
+  public String showUpdateForm(@PathVariable("id") Integer id, Model model)
+      throws ResourceNotFoundException {
+    model.addAttribute("ratingDto", ratingService.findById(id));
     return "rating/update";
   }
 
   @PostMapping("/rating/update/{id}")
-  public String updateRating(@PathVariable("id") Integer id, @Valid Rating rating,
-                             BindingResult result, Model model) {
-    // TODO: check required fields, if valid call service to update Rating and return Rating list
-    return "redirect:/rating/list";
+  public String updateRating(@PathVariable("id") Integer id, @Valid RatingDto ratingDto,
+                             BindingResult result, Model model) throws ResourceNotFoundException {
+    if (!result.hasErrors()) {
+      ratingDto.setId(id);
+      ratingService.update(ratingDto);
+      return "redirect:/rating/list";
+    }
+    return "rating/update";
   }
 
   @GetMapping("/rating/delete/{id}")
