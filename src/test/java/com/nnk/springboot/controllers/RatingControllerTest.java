@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.nnk.springboot.dto.RatingDto;
-import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.RatingService;
 import java.util.ArrayList;
@@ -234,6 +233,34 @@ class RatingControllerTest {
         .andExpect(flash().attributeExists("error"));
     verify(ratingService, times(1)).update(dtoCaptor.capture());
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
+  @DisplayName("GET /rating/delete should delete Rating then return view")
+  @Test
+  void deleteCurveTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/rating/delete/1"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/rating/list"));
+    verify(ratingService, times(1)).delete(1);
+  }
+
+  @DisplayName("GET /Rating/delete when Rating not found should return view with error message")
+  @Test
+  void deleteCurveWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This Rating is not found")).when(ratingService).delete(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/rating/delete/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/rating/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(ratingService, times(1)).delete(9);
   }
   
 }
