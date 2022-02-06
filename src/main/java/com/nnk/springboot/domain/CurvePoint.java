@@ -25,7 +25,7 @@ public class CurvePoint {
    * @param term    of the CurvePoint
    * @param value   of the CurvePoint
    */
-  public CurvePoint(Integer curveId, double term, double value) {
+  public CurvePoint(Integer curveId, Double term, Double value) {
     this.curveId = curveId;
     this.term = term;
     this.value = value;
@@ -40,9 +40,9 @@ public class CurvePoint {
   @Column(name = "asofdate")
   private LocalDateTime asOfDate;
   @Column(name = "term")
-  private double term;
+  private Double term;
   @Column(name = "value")
-  private double value;
+  private Double value;
   @Column(name = "creationdate")
   private LocalDateTime creationDate;
 
@@ -62,19 +62,19 @@ public class CurvePoint {
     this.curveId = curveId;
   }
 
-  public double getTerm() {
+  public Double getTerm() {
     return term;
   }
 
-  public void setTerm(double term) {
+  public void setTerm(Double term) {
     this.term = term;
   }
 
-  public double getValue() {
+  public Double getValue() {
     return value;
   }
 
-  public void setValue(double value) {
+  public void setValue(Double value) {
     this.value = value;
   }
 

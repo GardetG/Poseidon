@@ -20,7 +20,7 @@ public class CurvePointDto {
    * @param term    of the DTO
    * @param value   of the DTO
    */
-  public CurvePointDto(Integer id, Integer curveId, double term, double value) {
+  public CurvePointDto(Integer id, Integer curveId, Double term, Double value) {
     this.id = id;
     this.curveId = curveId;
     this.term = term;
@@ -31,10 +31,12 @@ public class CurvePointDto {
   @NotNull(message = "Id must not be null")
   @Min(value = 0, message = "Id must be positive")
   private Integer curveId;
+  @NotNull(message = "Term is mandatory")
   @Digits(integer = 20, fraction = 2)
-  private double term;
+  private Double term;
+  @NotNull(message = "Value is mandatory")
   @Digits(integer = 20, fraction = 2)
-  private double value;
+  private Double value;
 
   public Integer getId() {
     return id;
@@ -52,19 +54,19 @@ public class CurvePointDto {
     this.curveId = curveId;
   }
 
-  public double getTerm() {
+  public Double getTerm() {
     return term;
   }
 
-  public void setTerm(double term) {
+  public void setTerm(Double term) {
     this.term = term;
   }
 
-  public double getValue() {
+  public Double getValue() {
     return value;
   }
 
-  public void setValue(double value) {
+  public void setValue(Double value) {
     this.value = value;
   }
 
