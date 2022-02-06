@@ -34,7 +34,7 @@ class CurvePointServiceTest {
   private CurvePointRepository curvePointRepository;
 
   @Captor
-  ArgumentCaptor<CurvePoint> curvePointArgumentCaptor;
+  private ArgumentCaptor<CurvePoint> curvePointArgumentCaptor;
 
   private CurvePoint curvePointTest;
   private CurvePointDto curvePointDtoTest;

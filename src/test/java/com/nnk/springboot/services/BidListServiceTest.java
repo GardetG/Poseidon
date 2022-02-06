@@ -34,7 +34,7 @@ class BidListServiceTest {
   private BidListRepository bidListRepository;
 
   @Captor
-  ArgumentCaptor<BidList> bidListArgumentCaptor;
+  private ArgumentCaptor<BidList> bidListArgumentCaptor;
 
   private BidList bidListTest;
   private BidListDto bidListDtoTest;

@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.dto.RatingDto;
-import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.RatingRepository;
 import java.util.Collections;
@@ -18,6 +17,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,6 +31,9 @@ class RatingServiceTest {
 
   @MockBean
   private RatingRepository ratingRepository;
+
+  @Captor
+  private ArgumentCaptor<Rating> ratingArgumentCaptor;
 
   private Rating ratingTest;
   private RatingDto ratingDtoTest;
@@ -97,6 +101,21 @@ class RatingServiceTest {
         .isInstanceOf(ResourceNotFoundException.class)
         .hasMessage("This rating is not found");
     verify(ratingRepository, times(1)).findById(9);
+  }
+  
+  @DisplayName("Add a new Rating should persist it into database")
+  @Test
+  void addTest() {
+    // GIVEN
+    RatingDto newRating = new RatingDto(0, "Moodys Rating", "S&P Rating", "Fitch Rating", 10);
+    Rating expectedRating = new Rating("Moodys Rating", "S&P Rating", "Fitch Rating", 10);
+
+    // WHEN
+    ratingService.add(newRating);
+
+    // THEN
+    verify(ratingRepository, times(1)).save(ratingArgumentCaptor.capture());
+    assertThat(ratingArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedRating);
   }
   
 }
