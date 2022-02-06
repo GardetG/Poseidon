@@ -70,7 +70,7 @@ class CurvePointServiceTest {
 
   @DisplayName("Find by id should return the corresponding curvePointDto")
   @Test
-  void findByIdTest() {
+  void findByIdTest() throws ResourceNotFoundException {
     // GIVEN
     when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(curvePointTest));
 

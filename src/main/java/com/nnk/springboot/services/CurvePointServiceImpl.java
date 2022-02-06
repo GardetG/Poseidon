@@ -1,6 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.CurvePointDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.CurvePointRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +31,15 @@ public class CurvePointServiceImpl implements CurvePointService {
   }
 
   @Override
-  public CurvePointDto findById(int id) {
-    return null;
+  public CurvePointDto findById(int id) throws ResourceNotFoundException {
+    return curvePointRepository.findById(id)
+        .map(curvePoint -> new CurvePointDto(
+            curvePoint.getId(),
+            curvePoint.getCurveId(),
+            curvePoint.getTerm(),
+            curvePoint.getValue()
+            )
+        ).orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
   }
 
   @Override
