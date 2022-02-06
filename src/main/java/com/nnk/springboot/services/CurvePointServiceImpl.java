@@ -1,7 +1,10 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.CurvePointDto;
+import com.nnk.springboot.repositories.CurvePointRepository;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,9 +13,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class CurvePointServiceImpl implements CurvePointService {
 
+  @Autowired
+  private CurvePointRepository curvePointRepository;
+
   @Override
   public List<CurvePointDto> findAll() {
-    return null;
+    return curvePointRepository.findAll()
+        .stream()
+        .map(curvePoint -> new CurvePointDto(
+                curvePoint.getId(),
+                curvePoint.getCurveId(),
+                curvePoint.getTerm(),
+                curvePoint.getValue()
+            )
+        ).collect(Collectors.toList());
   }
 
   @Override
