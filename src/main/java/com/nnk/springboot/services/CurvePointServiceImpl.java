@@ -7,18 +7,25 @@ import com.nnk.springboot.repositories.CurvePointRepository;
 import com.nnk.springboot.utils.CurvePointMapper;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Service class implementation for BidList entity CRUD operations.
+ * Service class implementation for CurvePoint entity CRUD operations.
  */
 @Service
 public class CurvePointServiceImpl implements CurvePointService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CurvePointServiceImpl.class);
+
   @Autowired
   private CurvePointRepository curvePointRepository;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<CurvePointDto> findAll() {
     return curvePointRepository.findAll()
@@ -27,11 +34,17 @@ public class CurvePointServiceImpl implements CurvePointService {
         .collect(Collectors.toList());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public CurvePointDto findById(int id) throws ResourceNotFoundException {
     return CurvePointMapper.toDto(getOrThrowException(id));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void add(CurvePointDto curvePointDto) {
     CurvePoint curvePointToAdd = new CurvePoint();
@@ -39,6 +52,9 @@ public class CurvePointServiceImpl implements CurvePointService {
     curvePointRepository.save(curvePointToAdd);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void update(CurvePointDto curvePointDto) throws ResourceNotFoundException {
     CurvePoint curvePointToUpdate = getOrThrowException(curvePointDto.getId());
@@ -46,6 +62,9 @@ public class CurvePointServiceImpl implements CurvePointService {
     curvePointRepository.save(curvePointToUpdate);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void delete(int id) throws ResourceNotFoundException {
     CurvePoint curvePointToDelete = getOrThrowException(id);
@@ -54,6 +73,9 @@ public class CurvePointServiceImpl implements CurvePointService {
 
   private CurvePoint getOrThrowException(int id) throws ResourceNotFoundException {
     return curvePointRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("This curvePoint is not found"));
+        .orElseThrow(() -> {
+          LOGGER.error("The CurvePoint with id {} is not found", id);
+          return new ResourceNotFoundException("This curvePoint is not found");
+        });
   }
 }
