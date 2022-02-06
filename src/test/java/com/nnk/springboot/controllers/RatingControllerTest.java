@@ -2,17 +2,22 @@ package com.nnk.springboot.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.nnk.springboot.dto.RatingDto;
+import com.nnk.springboot.dto.RatingDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.RatingService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -127,6 +132,108 @@ class RatingControllerTest {
         .andExpect(model().attributeHasFieldErrors("ratingDto", "sandpRating"))
         .andExpect(model().attributeHasFieldErrors("ratingDto", "orderNumber"));
     verify(ratingService, times(0)).add(any(RatingDto.class));
+  }
+
+  @DisplayName("GET /rating/update should return view")
+  @Test
+  void showUpdateFormTest() throws Exception {
+    // GIVEN
+    RatingDto ratingDto = new RatingDto(1, "Moody's Rating 1", "S&P Rating 1", "Fitch Rating 1", 10);
+    when(ratingService.findById(anyInt())).thenReturn(ratingDto);
+
+    // WHEN
+    mockMvc.perform(get("/rating/update/1"))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("rating/update"))
+        .andExpect(model().attributeExists("ratingDto"))
+        .andExpect(model().attribute("ratingDto", ratingDto));
+    verify(ratingService, times(1)).findById(1);
+  }
+
+  @DisplayName("GET /rating/update when rating not found should return view with error message")
+  @Test
+  void showUpdateFormWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This rating is not found")).when(ratingService).findById(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/rating/update/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/rating/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(ratingService, times(1)).findById(9);
+  }
+
+  @DisplayName("POST valid DTO on /rating/update should persist rating then return view")
+  @Test
+  void updateCurveTest() throws Exception {
+    // GIVEN
+    RatingDto expectedDto = new RatingDto(1, "Update Moody's Rating", "Update S&P Rating", "Update Fitch Rating", 11);
+
+    // WHEN
+    mockMvc.perform(post("/rating/update/1")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("moodysRating", expectedDto.getMoodysRating())
+            .param("sandpRating", expectedDto.getSandpRating())
+            .param("fitchRating", expectedDto.getFitchRating())
+            .param("orderNumber", String.valueOf(expectedDto.getOrderNumber()))
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/rating/list"));
+    verify(ratingService, times(1)).update(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
+  @DisplayName("POST invalid DTO on /rating/update should return from view")
+  @Test
+  void updateCurveWhenInvalidTest() throws Exception {
+    // WHEN
+    mockMvc.perform(post("/rating/update/1")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("moodysRating", "This Moody's Rating exceed the 125 characters limit to test the validation of the Dto" +
+                "when the add Rating form is submit by the user")
+            .param("sandpRating", "")
+            .param("fitchRating", "Fitch Rating")
+            .param("orderNumber", String.valueOf(-5))
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("rating/update"))
+        .andExpect(model().attributeHasFieldErrors("ratingDto", "moodysRating"))
+        .andExpect(model().attributeHasFieldErrors("ratingDto", "sandpRating"))
+        .andExpect(model().attributeHasFieldErrors("ratingDto", "orderNumber"));
+    verify(ratingService, times(0)).update(any(RatingDto.class));
+  }
+
+  @DisplayName("POST DTO on /rating/update when rating not found should return view with error message")
+  @Test
+  void updateCurveWhenNotFoundTest() throws Exception {
+    // GIVEN
+    RatingDto expectedDto = new RatingDto(9, "Update Moody's Rating", "Update S&P Rating", "Update Fitch Rating", 11);
+    doThrow(new ResourceNotFoundException("This rating is not found")).when(ratingService).update(any(RatingDto.class));
+
+    // WHEN
+    mockMvc.perform(post("/rating/update/9")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("moodysRating", expectedDto.getMoodysRating())
+            .param("sandpRating", expectedDto.getSandpRating())
+            .param("fitchRating", expectedDto.getFitchRating())
+            .param("orderNumber", String.valueOf(expectedDto.getOrderNumber()))
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/rating/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(ratingService, times(1)).update(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
   
 }
