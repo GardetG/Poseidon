@@ -227,4 +227,32 @@ class BidListControllerTest {
     verify(bidListService, times(1)).update(dtoCaptor.capture());
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
+
+  @DisplayName("GET /bidList/delete should delete bidList then return view")
+  @Test
+  void deleteBidTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/bidList/delete/1"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/bidList/list"));
+    verify(bidListService, times(1)).delete(1);
+  }
+
+  @DisplayName("GET /bidList/delete when BidList not found should return view with error message")
+  @Test
+  void deleteBidWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This bidList is not found")).when(bidListService).delete(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/bidList/delete/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/bidList/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(bidListService, times(1)).delete(9);
+  }
 }
