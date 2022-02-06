@@ -50,7 +50,9 @@ public class RatingServiceImpl implements RatingService {
   }
 
   @Override
-  public void delete(int id) {
-
+  public void delete(int id) throws ResourceNotFoundException {
+    Rating ratingToDelete = ratingRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This rating is not found"));
+    ratingRepository.delete(ratingToDelete);
   }
 }
