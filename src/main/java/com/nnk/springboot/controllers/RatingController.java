@@ -24,7 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class RatingController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RatingController.class);
-  
+
   @Autowired
   private RatingService ratingService;
 
@@ -59,11 +59,11 @@ public class RatingController {
    * Else, call the service layer to persist Rating and return the Rating list view.
    *
    * @param ratingDto of the form
-   * @param result hold validation errors
+   * @param result    hold validation errors
    * @return View
    */
   @PostMapping("/rating/validate")
-  public String validate(@Valid RatingDto ratingDto, BindingResult result, Model model) {
+  public String validate(@Valid RatingDto ratingDto, BindingResult result) {
     LOGGER.info("Request add Rating form validation");
     if (!result.hasErrors()) {
       ratingService.add(ratingDto);
@@ -77,7 +77,7 @@ public class RatingController {
   /**
    * Show a view with update Rating form prefilled with Rating current values.
    *
-   * @param id of the Rating to update
+   * @param id    of the Rating to update
    * @param model of the view
    * @return View
    * @throws ResourceNotFoundException when the requested Rating not found
@@ -95,15 +95,15 @@ public class RatingController {
    * If form contains errors, show the form view to display fields validation errors.
    * Else, call the service layer to persist Rating and return to Rating list view.
    *
-   * @param id of the Rating to update
+   * @param id        of the Rating to update
    * @param ratingDto of the form
-   * @param result hold validation errors
+   * @param result    hold validation errors
    * @return View
    * @throws ResourceNotFoundException when the requested Rating not found
    */
   @PostMapping("/rating/update/{id}")
   public String updateRating(@PathVariable("id") Integer id, @Valid RatingDto ratingDto,
-                             BindingResult result, Model model) throws ResourceNotFoundException {
+                             BindingResult result) throws ResourceNotFoundException {
     LOGGER.info("Request update Rating id {} form validation", id);
     if (!result.hasErrors()) {
       ratingDto.setId(id);
@@ -123,7 +123,7 @@ public class RatingController {
    * @throws ResourceNotFoundException when the requested Rating not found
    */
   @GetMapping("/rating/delete/{id}")
-  public String deleteRating(@PathVariable("id") Integer id, Model model)
+  public String deleteRating(@PathVariable("id") Integer id)
       throws ResourceNotFoundException {
     LOGGER.info("Request Rating id {} deletion", id);
     ratingService.delete(id);
@@ -134,7 +134,7 @@ public class RatingController {
   /**
    * Handle ResourceNotFoundException and redirect to Rating list view with an error message.
    *
-   * @param e exception handled
+   * @param e                  exception handled
    * @param redirectAttributes to add message to the view
    * @return View
    */

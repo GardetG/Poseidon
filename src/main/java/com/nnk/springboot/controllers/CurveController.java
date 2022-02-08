@@ -59,7 +59,7 @@ public class CurveController {
    * Else, call the service layer to persist CurvePoint and return the CurvePoint list view.
    *
    * @param curvePointDto of the form
-   * @param result hold validation errors
+   * @param result        hold validation errors
    * @return View
    */
   @PostMapping("/curvePoint/validate")
@@ -77,7 +77,7 @@ public class CurveController {
   /**
    * Show a view with update CurvePoint form prefilled with CurvePoint current values.
    *
-   * @param id of the CurvePoint to update
+   * @param id    of the CurvePoint to update
    * @param model of the view
    * @return View
    * @throws ResourceNotFoundException when the requested CurvePoint not found
@@ -95,15 +95,15 @@ public class CurveController {
    * If form contains errors, show the form view to display fields validation errors.
    * Else, call the service layer to persist CurvePoint and return to CurvePoint list view.
    *
-   * @param id of the CurvePoint to update
+   * @param id            of the CurvePoint to update
    * @param curvePointDto of the form
-   * @param result hold validation errors
+   * @param result        hold validation errors
    * @return View
    * @throws ResourceNotFoundException when the requested CurvePoint not found
    */
   @PostMapping("/curvePoint/update/{id}")
   public String updateCurve(@PathVariable("id") Integer id, @Valid CurvePointDto curvePointDto,
-                          BindingResult result) throws ResourceNotFoundException {
+                            BindingResult result) throws ResourceNotFoundException {
     LOGGER.info("Request update CurvePoint id {} form validation", id);
     if (!result.hasErrors()) {
       curvePointDto.setId(id);
@@ -134,7 +134,7 @@ public class CurveController {
   /**
    * Handle ResourceNotFoundException and redirect to CurvePoint list view with an error message.
    *
-   * @param e exception handled
+   * @param e                  exception handled
    * @param redirectAttributes to add message to the view
    * @return View
    */
