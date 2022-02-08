@@ -229,5 +229,33 @@ class TradeControllerTest {
     verify(tradeService, times(1)).update(dtoCaptor.capture());
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
+
+  @DisplayName("GET /trade/delete should delete Trade then return view")
+  @Test
+  void deleteCurveTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/trade/delete/1"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/trade/list"));
+    verify(tradeService, times(1)).delete(1);
+  }
+
+  @DisplayName("GET /Trade/delete when Trade not found should return view with error message")
+  @Test
+  void deleteCurveWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This Trade is not found")).when(tradeService).delete(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/trade/delete/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/trade/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(tradeService, times(1)).delete(9);
+  }
   
 }
