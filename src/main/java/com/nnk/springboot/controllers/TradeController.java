@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class TradeController {
@@ -63,4 +65,12 @@ public class TradeController {
     // TODO: Find Trade by Id and delete the Trade, return to Trade list
     return "redirect:/trade/list";
   }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public String handleResourceNotFoundException(ResourceNotFoundException e,
+                                                RedirectAttributes redirectAttributes) {
+    redirectAttributes.addFlashAttribute("error", e.getMessage());
+    return "redirect:/trade/list";
+  }
+
 }
