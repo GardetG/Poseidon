@@ -155,4 +155,35 @@ class TradeServiceTest {
     verify(tradeRepository, times(0)).save(any(Trade.class));
   }
   
+  @DisplayName("Delete a Trade should delete it from database")
+  @Test
+  void deleteTest() throws ResourceNotFoundException {
+    // GIVEN
+    when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(tradeTest));
+
+    // WHEN
+    tradeService.delete(1);
+
+    // THEN
+    verify(tradeRepository, times(1)).findById(1);
+    verify(tradeRepository, times(1)).delete(tradeArgumentCaptor.capture());
+    assertThat(tradeArgumentCaptor.getValue()).isEqualTo(tradeTest);
+  }
+
+  @DisplayName("Delete a Trade when it's not found should throw an exception")
+  @Test
+  void deleteWhenNotFoundTest() {
+    // GIVEN
+    when(tradeRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> tradeService.delete(9))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This trade is not found");
+    verify(tradeRepository, times(1)).findById(9);
+    verify(tradeRepository, times(0)).delete(any(Trade.class));
+  }
+  
 }
