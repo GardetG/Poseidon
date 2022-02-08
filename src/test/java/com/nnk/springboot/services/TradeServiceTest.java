@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.Trade;
+import com.nnk.springboot.domain.Trade;
+import com.nnk.springboot.dto.TradeDto;
 import com.nnk.springboot.dto.TradeDto;
 import com.nnk.springboot.dto.TradeDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
@@ -104,4 +106,19 @@ class TradeServiceTest {
     verify(tradeRepository, times(1)).findById(9);
   }
   
+  @DisplayName("Add a new Trade should persist it into database")
+  @Test
+  void addTest() {
+    // GIVEN
+    TradeDto newTrade = new TradeDto(0, "Trade Account", "Type", 10d);
+    Trade expectedTrade = new Trade("Trade Account", "Type", 10d);
+
+    // WHEN
+    tradeService.add(newTrade);
+
+    // THEN
+    verify(tradeRepository, times(1)).save(tradeArgumentCaptor.capture());
+    assertThat(tradeArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedTrade);
+  }
+
 }
