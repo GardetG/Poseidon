@@ -252,4 +252,32 @@ class RuleNameControllerTest {
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
 
+  @DisplayName("GET /ruleName/delete should delete RuleName then return view")
+  @Test
+  void deleteCurveTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/ruleName/delete/1"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/ruleName/list"));
+    verify(ruleNameService, times(1)).delete(1);
+  }
+
+  @DisplayName("GET /RuleName/delete when RuleName not found should return view with error message")
+  @Test
+  void deleteCurveWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This RuleName is not found")).when(ruleNameService).delete(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/ruleName/delete/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/ruleName/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(ruleNameService, times(1)).delete(9);
+  }
+
 }
