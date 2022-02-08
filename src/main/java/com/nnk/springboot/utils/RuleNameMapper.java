@@ -30,4 +30,19 @@ public class RuleNameMapper {
     );
   }
 
+  /**
+   * Map a RuleNameDto into entity.
+   *
+   * @param ruleName to map into
+   * @param ruleNameDto to map from
+   */
+  public static void toEntity(RuleName ruleName, RuleNameDto ruleNameDto) {
+    ruleName.setName(ruleNameDto.getName());
+    ruleName.setDescription(ruleNameDto.getDescription());
+    ruleName.setJson(ruleNameDto.getJson());
+    ruleName.setTemplate(ruleNameDto.getTemplate());
+    ruleName.setSqlStr(ruleNameDto.getSqlStr());
+    ruleName.setSqlPart(ruleNameDto.getSqlPart());
+  }
+  
 }
