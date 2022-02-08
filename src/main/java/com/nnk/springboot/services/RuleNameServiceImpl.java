@@ -3,6 +3,7 @@ package com.nnk.springboot.services;
 import com.nnk.springboot.dto.RuleNameDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.RuleNameRepository;
+import com.nnk.springboot.utils.RuleNameMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,31 +22,15 @@ public class RuleNameServiceImpl implements RuleNameService {
   public List<RuleNameDto> findAll() {
     return ruleNameRepository.findAll()
         .stream()
-        .map(ruleName -> new RuleNameDto(
-                ruleName.getId(),
-                ruleName.getName(),
-                ruleName.getDescription(),
-                ruleName.getJson(),
-                ruleName.getTemplate(),
-                ruleName.getSqlStr(),
-                ruleName.getSqlPart()
-            )
-        ).collect(Collectors.toList());
+        .map(RuleNameMapper::toDto)
+        .collect(Collectors.toList());
   }
 
   @Override
   public RuleNameDto findById(int id) throws ResourceNotFoundException {
     return ruleNameRepository.findById(id)
-        .map(ruleName -> new RuleNameDto(
-                ruleName.getId(),
-                ruleName.getName(),
-                ruleName.getDescription(),
-                ruleName.getJson(),
-                ruleName.getTemplate(),
-                ruleName.getSqlStr(),
-                ruleName.getSqlPart()
-            )
-        ).orElseThrow(() -> new ResourceNotFoundException("This ruleName is not found"));
+        .map(RuleNameMapper::toDto)
+        .orElseThrow(() -> new ResourceNotFoundException("This ruleName is not found"));
   }
 
   @Override
