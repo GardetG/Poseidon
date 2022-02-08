@@ -2,15 +2,13 @@ package com.nnk.springboot.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.Trade;
-import com.nnk.springboot.domain.Trade;
-import com.nnk.springboot.dto.TradeDto;
-import com.nnk.springboot.dto.TradeDto;
 import com.nnk.springboot.dto.TradeDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.TradeRepository;
@@ -121,4 +119,40 @@ class TradeServiceTest {
     assertThat(tradeArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedTrade);
   }
 
+  @DisplayName("Update a Trade should persist it into database")
+  @Test
+  void updateTest() throws ResourceNotFoundException {
+    // GIVEN
+    TradeDto updateTrade = new TradeDto(1, "Update Trade Account", "Update Type", 20d);
+    Trade expectedTrade = new Trade("Update Trade Account", "Update Type", 20d);
+    expectedTrade.setTradeId(1);
+    when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(tradeTest));
+
+    // WHEN
+    tradeService.update(updateTrade);
+
+    // THEN
+    verify(tradeRepository, times(1)).findById(1);
+    verify(tradeRepository, times(1)).save(tradeArgumentCaptor.capture());
+    assertThat(tradeArgumentCaptor.getValue()).usingRecursiveComparison()
+        .isEqualTo(expectedTrade);
+  }
+
+  @DisplayName("Update a Trade when it's not found should throw an exception")
+  @Test
+  void updateWhenNotFoundTest() {
+    // GIVEN
+    TradeDto updateTrade = new TradeDto(9, "Update Trade Account", "Update Type", 20d);
+    when(tradeRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> tradeService.update(updateTrade))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This trade is not found");
+    verify(tradeRepository, times(1)).findById(9);
+    verify(tradeRepository, times(0)).save(any(Trade.class));
+  }
+  
 }
