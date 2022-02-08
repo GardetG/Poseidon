@@ -61,8 +61,9 @@ public class TradeController {
   }
 
   @GetMapping("/trade/delete/{id}")
-  public String deleteTrade(@PathVariable("id") Integer id, Model model) {
-    // TODO: Find Trade by Id and delete the Trade, return to Trade list
+  public String deleteTrade(@PathVariable("id") Integer id, Model model)
+      throws ResourceNotFoundException {
+    tradeService.delete(id);
     return "redirect:/trade/list";
   }
 
