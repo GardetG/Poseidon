@@ -14,8 +14,7 @@ import javax.persistence.Table;
 @Table(name = "rulename")
 public class RuleName {
 
-  public RuleName() {
-  }
+  public RuleName() { }
 
   /**
    * Create an instance of RuleName with name, description, json, template and SQL.

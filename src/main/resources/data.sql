@@ -23,3 +23,7 @@ insert into RuleName(Id, name, description, json, template, sqlStr, sqlPart)
 insert into RuleName(Id, name, description, json, template, sqlStr, sqlPart)
     values (2, 'Name to delete', 'Description to delete', 'Json to delete', 'Template to delete', 'SQL to delete', 'SQLPart to delete');
 
+insert into Trade(TradeId, account, type, buyQuantity)
+    values(1, 'Account Test', 'Type Test', 10.0);
+insert into Trade(TradeId, account, type, buyQuantity)
+    values(2, 'Account to delete', 'Type to delete', 20.0);
