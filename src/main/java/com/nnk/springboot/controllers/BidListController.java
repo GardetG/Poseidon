@@ -59,7 +59,7 @@ public class BidListController {
    * Else, call the service layer to persist BidList and return to BidList list view.
    *
    * @param bidListDto of the form
-   * @param result hold validation errors
+   * @param result     hold validation errors
    * @return View
    */
   @PostMapping("/bidList/validate")
@@ -77,7 +77,7 @@ public class BidListController {
   /**
    * Show a view with update BidList form prefilled with BidList current values.
    *
-   * @param id of the BidList to update
+   * @param id    of the BidList to update
    * @param model of the view
    * @return View
    * @throws ResourceNotFoundException when the requested BidList not found
@@ -95,9 +95,9 @@ public class BidListController {
    * If form contains errors, show the form view to display fields validation errors.
    * Else, call the service layer to persist BidList and return to BidList list view.
    *
-   * @param id of the BidList to update
+   * @param id         of the BidList to update
    * @param bidListDto of the form
-   * @param result hold validation errors
+   * @param result     hold validation errors
    * @return View
    * @throws ResourceNotFoundException when the requested BidList not found
    */
@@ -135,7 +135,7 @@ public class BidListController {
   /**
    * Handle ResourceNotFoundException and redirect to BidList list view with an error message.
    *
-   * @param e exception handled
+   * @param e                  exception handled
    * @param redirectAttributes to add error message to the view
    * @return View
    */
