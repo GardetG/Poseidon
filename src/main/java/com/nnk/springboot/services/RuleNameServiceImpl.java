@@ -48,8 +48,16 @@ public class RuleNameServiceImpl implements RuleNameService {
   }
 
   @Override
-  public void update(RuleNameDto ruleNameDto) {
-
+  public void update(RuleNameDto ruleNameDto) throws ResourceNotFoundException {
+    RuleName ruleNameToUpdate = ruleNameRepository.findById(ruleNameDto.getId())
+        .orElseThrow(() -> new ResourceNotFoundException("This ruleName is not found"));
+    ruleNameToUpdate.setName(ruleNameDto.getName());
+    ruleNameToUpdate.setDescription(ruleNameDto.getDescription());
+    ruleNameToUpdate.setJson(ruleNameDto.getJson());
+    ruleNameToUpdate.setTemplate(ruleNameDto.getTemplate());
+    ruleNameToUpdate.setSqlStr(ruleNameDto.getSqlStr());
+    ruleNameToUpdate.setSqlPart(ruleNameDto.getSqlPart());
+    ruleNameRepository.save(ruleNameToUpdate);
   }
 
   @Override

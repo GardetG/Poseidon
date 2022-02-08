@@ -17,7 +17,7 @@ public interface RuleNameService {
 
   void add(RuleNameDto ruleNameDto);
 
-  void update(RuleNameDto ruleNameDto);
+  void update(RuleNameDto ruleNameDto) throws ResourceNotFoundException;
 
   void delete(int id);
 
