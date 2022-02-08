@@ -2,6 +2,7 @@ package com.nnk.springboot.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -117,5 +118,41 @@ class RuleNameServiceTest {
     verify(ruleNameRepository, times(1)).save(ruleNameArgumentCaptor.capture());
     assertThat(ruleNameArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedRuleName);
   }
-  
+
+  @DisplayName("Update a RuleName should persist it into database")
+  @Test
+  void updateTest() throws ResourceNotFoundException {
+    // GIVEN
+    RuleNameDto updateRuleName = new RuleNameDto(1, "Update Rule Name", "Update Description", "Update Json", "Update Template", "Update SQL", "Update SQL Part");
+    RuleName expectedRuleName = new RuleName("Update Rule Name", "Update Description", "Update Json", "Update Template", "Update SQL", "Update SQL Part");
+    expectedRuleName.setId(1);
+    when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(ruleNameTest));
+
+    // WHEN
+    ruleNameService.update(updateRuleName);
+
+    // THEN
+    verify(ruleNameRepository, times(1)).findById(1);
+    verify(ruleNameRepository, times(1)).save(ruleNameArgumentCaptor.capture());
+    assertThat(ruleNameArgumentCaptor.getValue()).usingRecursiveComparison()
+        .isEqualTo(expectedRuleName);
+  }
+
+  @DisplayName("Update a RuleName when it's not found should throw an exception")
+  @Test
+  void updateWhenNotFoundTest() {
+    // GIVEN
+    RuleNameDto updateRuleName = new RuleNameDto(9, "Update Rule Name", "Update Description", "Update Json", "Update Template", "Update SQL", "Update SQL Part");
+    when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> ruleNameService.update(updateRuleName))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This ruleName is not found");
+    verify(ruleNameRepository, times(1)).findById(9);
+    verify(ruleNameRepository, times(0)).save(any(RuleName.class));
+  }
+
 }
