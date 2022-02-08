@@ -1,7 +1,10 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.TradeDto;
+import com.nnk.springboot.repositories.TradeRepository;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,9 +13,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class TradeServiceImpl implements TradeService {
 
+  @Autowired
+  private TradeRepository tradeRepository;
+
   @Override
   public List<TradeDto> findAll() {
-    return null;
+    return tradeRepository.findAll()
+        .stream()
+        .map(trade -> new TradeDto(
+            trade.getTradeId(),
+            trade.getAccount(),
+            trade.getType(),
+            trade.getBuyQuantity()
+        ))
+        .collect(Collectors.toList());
   }
 
   @Override
