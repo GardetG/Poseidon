@@ -1,5 +1,6 @@
 package com.nnk.springboot.services;
 
+import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.dto.TradeDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.TradeRepository;
@@ -44,7 +45,12 @@ public class TradeServiceImpl implements TradeService {
 
   @Override
   public void add(TradeDto tradeDto) {
-
+    Trade tradeToAdd = new Trade(
+        tradeDto.getAccount(),
+        tradeDto.getType(),
+        tradeDto.getBuyQuantity()
+    );
+    tradeRepository.save(tradeToAdd);
   }
 
   @Override
