@@ -1,7 +1,7 @@
 package com.nnk.springboot.controllers;
 
-import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.dto.RuleNameDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.RuleNameService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +43,21 @@ public class RuleNameController {
   }
 
   @GetMapping("/ruleName/update/{id}")
-  public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-    // TODO: get RuleName by Id and to model then show to the form
+  public String showUpdateForm(@PathVariable("id") Integer id, Model model)
+      throws ResourceNotFoundException {
+    model.addAttribute("ruleNameDto", ruleNameService.findById(id));
     return "ruleName/update";
   }
 
   @PostMapping("/ruleName/update/{id}")
-  public String updateRuleName(@PathVariable("id") Integer id, @Valid RuleName ruleName,
-                               BindingResult result, Model model) {
-    // TODO: check required fields, if valid call service to update RuleName and return RuleName list
-    return "redirect:/ruleName/list";
+  public String updateRuleName(@PathVariable("id") Integer id, @Valid RuleNameDto ruleNameDto,
+                               BindingResult result, Model model) throws ResourceNotFoundException {
+    if (!result.hasErrors()) {
+      ruleNameDto.setId(id);
+      ruleNameService.update(ruleNameDto);
+      return "redirect:/ruleName/list";
+    }
+    return "ruleName/update";
   }
 
   @GetMapping("/ruleName/delete/{id}")
