@@ -1,7 +1,13 @@
 package com.nnk.springboot.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -18,6 +24,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(RuleNameController.class)
@@ -66,4 +73,68 @@ class RuleNameControllerTest {
         .andExpect(model().attributeExists("ruleNames"))
         .andExpect(model().attribute("ruleNames", Collections.emptyList()));
   }
+
+  @DisplayName("GET /ruleName/add should return view")
+  @Test
+  void addRuleNameFormTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/ruleName/add"))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("ruleName/add"));
+  }
+
+  @DisplayName("POST valid DTO on /ruleName/validate should persist RuleName then return view")
+  @Test
+  void validateTest() throws Exception {
+    // GIVEN
+    RuleNameDto
+        expectedDto = new RuleNameDto(null, "Rule Name", "Description", "Json", "Template", "SQL", "SQL Part");
+
+    // WHEN
+    mockMvc.perform(post("/ruleName/validate")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("name", expectedDto.getName())
+            .param("description", expectedDto.getDescription())
+            .param("json", expectedDto.getJson())
+            .param("template", expectedDto.getTemplate())
+            .param("sqlStr", expectedDto.getSqlStr())
+            .param("sqlPart", expectedDto.getSqlPart())
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/ruleName/list"));
+    verify(ruleNameService, times(1)).add(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
+  @DisplayName("POST invalid DTO on /ruleName/validate should return form view")
+  @Test
+  void validateWhenInvalidTest() throws Exception {
+    // WHEN
+    mockMvc.perform(post("/ruleName/validate")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("name", "This ruleName's name exceed the 125 characters limit to test the validation of the Dto " +
+                "when the add RuleName form is submit by the user")
+            .param("description", "")
+            .param("json", "")
+            .param("template", "")
+            .param("sqlStr", "")
+            .param("sqlPart", "")
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("ruleName/add"))
+        .andExpect(model().attributeHasFieldErrors("ruleNameDto", "name"))
+        .andExpect(model().attributeHasFieldErrors("ruleNameDto", "description"))
+        .andExpect(model().attributeHasFieldErrors("ruleNameDto", "json"))
+        .andExpect(model().attributeHasFieldErrors("ruleNameDto", "template"))
+        .andExpect(model().attributeHasFieldErrors("ruleNameDto", "sqlStr"))
+        .andExpect(model().attributeHasFieldErrors("ruleNameDto", "sqlPart"));
+    verify(ruleNameService, times(0)).add(any(RuleNameDto.class));
+  }
+  
 }
