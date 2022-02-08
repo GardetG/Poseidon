@@ -155,4 +155,35 @@ class RuleNameServiceTest {
     verify(ruleNameRepository, times(0)).save(any(RuleName.class));
   }
 
+  @DisplayName("Delete a RuleName should delete it from database")
+  @Test
+  void deleteTest() throws ResourceNotFoundException {
+    // GIVEN
+    when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(ruleNameTest));
+
+    // WHEN
+    ruleNameService.delete(1);
+
+    // THEN
+    verify(ruleNameRepository, times(1)).findById(1);
+    verify(ruleNameRepository, times(1)).delete(ruleNameArgumentCaptor.capture());
+    assertThat(ruleNameArgumentCaptor.getValue()).isEqualTo(ruleNameTest);
+  }
+
+  @DisplayName("Delete a RuleName when it's not found should throw an exception")
+  @Test
+  void deleteWhenNotFoundTest() {
+    // GIVEN
+    when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> ruleNameService.delete(9))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This ruleName is not found");
+    verify(ruleNameRepository, times(1)).findById(9);
+    verify(ruleNameRepository, times(0)).delete(any(RuleName.class));
+  }
+
 }
