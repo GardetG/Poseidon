@@ -17,7 +17,7 @@ public interface TradeService {
 
   void add(TradeDto tradeDto);
 
-  void update(TradeDto tradeDto);
+  void update(TradeDto tradeDto) throws ResourceNotFoundException;
 
   void delete(int id);
 

@@ -54,8 +54,13 @@ public class TradeServiceImpl implements TradeService {
   }
 
   @Override
-  public void update(TradeDto tradeDto) {
-
+  public void update(TradeDto tradeDto) throws ResourceNotFoundException {
+    Trade tradeToUpdate = tradeRepository.findById(tradeDto.getTradeId())
+        .orElseThrow(() -> new ResourceNotFoundException("This trade is not found"));
+    tradeToUpdate.setAccount(tradeDto.getAccount());
+    tradeToUpdate.setType(tradeDto.getType());
+    tradeToUpdate.setBuyQuantity(tradeDto.getBuyQuantity());
+    tradeRepository.save(tradeToUpdate);
   }
 
   @Override
