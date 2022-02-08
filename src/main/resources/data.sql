@@ -17,3 +17,9 @@ insert into Rating(Id, moodysRating, sandPRating, fitchRating, orderNumber)
     values(1, 'Moody Rating Test', 'S&P Rating Test', 'Fitch Rating Test', 10);
 insert into Rating(Id, moodysRating, sandPRating, fitchRating, orderNumber)
     values(2, 'Moody Rating to delete Test', 'S&P Rating to delete Test', 'Fitch Rating to delete Test', 11);
+
+insert into RuleName(Id, name, description, json, template, sqlStr, sqlPart)
+    values (1, 'Name Test', 'Description Test', 'Json Test', 'Template Test', 'SQL Test', 'SQLPart Test');
+insert into RuleName(Id, name, description, json, template, sqlStr, sqlPart)
+    values (2, 'Name to delete', 'Description to delete', 'Json to delete', 'Template to delete', 'SQL to delete', 'SQLPart to delete');
+
