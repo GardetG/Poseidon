@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.RuleName;
+import com.nnk.springboot.dto.RuleNameDto;
 import com.nnk.springboot.services.RuleNameService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,16 @@ public class RuleNameController {
   }
 
   @GetMapping("/ruleName/add")
-  public String addRuleForm(RuleName bid) {
+  public String addRuleForm(RuleNameDto ruleNameDto) {
     return "ruleName/add";
   }
 
   @PostMapping("/ruleName/validate")
-  public String validate(@Valid RuleName ruleName, BindingResult result, Model model) {
-    // TODO: check data valid and save to db, after saving return RuleName list
+  public String validate(@Valid RuleNameDto ruleNameDto, BindingResult result, Model model) {
+    if (!result.hasErrors()) {
+      ruleNameService.add(ruleNameDto);
+      return "redirect:/ruleName/list";
+    }
     return "ruleName/add";
   }
 
