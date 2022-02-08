@@ -1,7 +1,7 @@
 package com.nnk.springboot.controllers;
 
-import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.dto.TradeDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.TradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,16 +41,21 @@ public class TradeController {
   }
 
   @GetMapping("/trade/update/{id}")
-  public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-    // TODO: get Trade by Id and to model then show to the form
+  public String showUpdateForm(@PathVariable("id") Integer id, Model model)
+      throws ResourceNotFoundException {
+    model.addAttribute("tradeDto", tradeService.findById(id));
     return "trade/update";
   }
 
   @PostMapping("/trade/update/{id}")
-  public String updateTrade(@PathVariable("id") Integer id, @Valid Trade trade,
-                            BindingResult result, Model model) {
-    // TODO: check required fields, if valid call service to update Trade and return Trade list
-    return "redirect:/trade/list";
+  public String updateTrade(@PathVariable("id") Integer id, @Valid TradeDto tradeDto,
+                            BindingResult result, Model model) throws ResourceNotFoundException {
+    if (!result.hasErrors()) {
+      tradeDto.setTradeId(id);
+      tradeService.update(tradeDto);
+      return "redirect:/trade/list";
+    }
+    return "trade/update";
   }
 
   @GetMapping("/trade/delete/{id}")
