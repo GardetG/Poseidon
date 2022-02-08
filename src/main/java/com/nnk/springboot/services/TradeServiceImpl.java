@@ -1,6 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.TradeDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.TradeRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +31,15 @@ public class TradeServiceImpl implements TradeService {
   }
 
   @Override
-  public TradeDto findById(int id) {
-    return null;
+  public TradeDto findById(int id) throws ResourceNotFoundException {
+    return tradeRepository.findById(id)
+        .map(trade -> new TradeDto(
+            trade.getTradeId(),
+            trade.getAccount(),
+            trade.getType(),
+            trade.getBuyQuantity()
+        ))
+        .orElseThrow(() -> new ResourceNotFoundException("This trade is not found"));
   }
 
   @Override
