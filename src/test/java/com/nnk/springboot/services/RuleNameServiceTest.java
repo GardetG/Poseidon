@@ -103,4 +103,19 @@ class RuleNameServiceTest {
     verify(ruleNameRepository, times(1)).findById(9);
   }
 
+  @DisplayName("Add a new RuleName should persist it into database")
+  @Test
+  void addTest() {
+    // GIVEN
+    RuleNameDto newRuleName = new RuleNameDto(0, "Rule Name", "Description", "Json", "Template", "SQL", "SQL Part");
+    RuleName expectedRuleName = new RuleName("Rule Name", "Description", "Json", "Template", "SQL", "SQL Part");
+
+    // WHEN
+    ruleNameService.add(newRuleName);
+
+    // THEN
+    verify(ruleNameRepository, times(1)).save(ruleNameArgumentCaptor.capture());
+    assertThat(ruleNameArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedRuleName);
+  }
+  
 }
