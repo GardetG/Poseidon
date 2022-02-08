@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Trade;
+import com.nnk.springboot.dto.TradeDto;
 import com.nnk.springboot.services.TradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,13 +27,16 @@ public class TradeController {
   }
 
   @GetMapping("/trade/add")
-  public String addUser(Trade bid) {
+  public String addUser(TradeDto tradeDto) {
     return "trade/add";
   }
 
   @PostMapping("/trade/validate")
-  public String validate(@Valid Trade trade, BindingResult result, Model model) {
-    // TODO: check data valid and save to db, after saving return Trade list
+  public String validate(@Valid TradeDto tradeDto, BindingResult result, Model model) {
+    if (!result.hasErrors()) {
+      tradeService.add(tradeDto);
+      return "redirect:/trade/list";
+    }
     return "trade/add";
   }
 
