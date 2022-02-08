@@ -29,9 +29,7 @@ public class RuleNameServiceImpl implements RuleNameService {
 
   @Override
   public RuleNameDto findById(int id) throws ResourceNotFoundException {
-    return ruleNameRepository.findById(id)
-        .map(RuleNameMapper::toDto)
-        .orElseThrow(() -> new ResourceNotFoundException("This ruleName is not found"));
+    return RuleNameMapper.toDto(getOrThrowException(id));
   }
 
   @Override
@@ -43,17 +41,20 @@ public class RuleNameServiceImpl implements RuleNameService {
 
   @Override
   public void update(RuleNameDto ruleNameDto) throws ResourceNotFoundException {
-    RuleName ruleNameToUpdate = ruleNameRepository.findById(ruleNameDto.getId())
-        .orElseThrow(() -> new ResourceNotFoundException("This ruleName is not found"));
+    RuleName ruleNameToUpdate = getOrThrowException(ruleNameDto.getId());
     RuleNameMapper.toEntity(ruleNameToUpdate, ruleNameDto);
     ruleNameRepository.save(ruleNameToUpdate);
   }
 
   @Override
   public void delete(int id) throws ResourceNotFoundException {
-    RuleName ruleNameToDelete = ruleNameRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("This ruleName is not found"));
+    RuleName ruleNameToDelete = getOrThrowException(id);
     ruleNameRepository.delete(ruleNameToDelete);
   }
 
+  private RuleName getOrThrowException(int id) throws ResourceNotFoundException {
+    return ruleNameRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This ruleName is not found"));
+  }
+  
 }
