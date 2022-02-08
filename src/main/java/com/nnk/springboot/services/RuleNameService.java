@@ -1,6 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.RuleNameDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ public interface RuleNameService {
 
   List<RuleNameDto> findAll();
 
-  RuleNameDto findById(int id);
+  RuleNameDto findById(int id) throws ResourceNotFoundException;
 
   void add(RuleNameDto ruleNameDto);
 
