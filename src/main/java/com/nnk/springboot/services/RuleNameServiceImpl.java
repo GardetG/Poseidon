@@ -50,8 +50,10 @@ public class RuleNameServiceImpl implements RuleNameService {
   }
 
   @Override
-  public void delete(int id) {
-
+  public void delete(int id) throws ResourceNotFoundException {
+    RuleName ruleNameToDelete = ruleNameRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This ruleName is not found"));
+    ruleNameRepository.delete(ruleNameToDelete);
   }
 
 }
