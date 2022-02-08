@@ -1,5 +1,6 @@
 package com.nnk.springboot.services;
 
+import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.dto.RuleNameDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.RuleNameRepository;
@@ -35,7 +36,15 @@ public class RuleNameServiceImpl implements RuleNameService {
 
   @Override
   public void add(RuleNameDto ruleNameDto) {
-
+    RuleName ruleNameToAdd = new RuleName(
+        ruleNameDto.getName(),
+        ruleNameDto.getDescription(),
+        ruleNameDto.getJson(),
+        ruleNameDto.getTemplate(),
+        ruleNameDto.getSqlStr(),
+        ruleNameDto.getSqlPart()
+    );
+    ruleNameRepository.save(ruleNameToAdd);
   }
 
   @Override
