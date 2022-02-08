@@ -47,8 +47,9 @@ public class TradeServiceImpl implements TradeService {
   }
 
   @Override
-  public void delete(int id) {
-
+  public void delete(int id) throws ResourceNotFoundException {
+    Trade tradeToDelete = getOrThrowException(id);
+    tradeRepository.delete(tradeToDelete);
   }
 
   private Trade getOrThrowException(int id) throws ResourceNotFoundException {
