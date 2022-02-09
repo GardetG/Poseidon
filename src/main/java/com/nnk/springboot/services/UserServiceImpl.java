@@ -1,6 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +31,15 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDto findById(int id) {
-    return null;
+  public UserDto findById(int id) throws ResourceNotFoundException {
+    return userRepository.findById(id)
+        .map(user -> new UserDto(
+            user.getId(),
+            user.getUsername(),
+            user.getFullName(),
+            user.getRole()
+        ))
+        .orElseThrow(() -> new ResourceNotFoundException("This user is not found"));
   }
 
   @Override
