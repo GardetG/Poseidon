@@ -1,12 +1,19 @@
 package com.nnk.springboot.controllers;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.services.UserService;
 import java.util.ArrayList;
@@ -65,4 +72,38 @@ class UserControllerTest {
         .andExpect(model().attribute("users", Collections.emptyList()));
   }
 
+  @DisplayName("GET /user/update should return view")
+  @Test
+  void showUpdateFormTest() throws Exception {
+    // GIVEN
+    UserDto userDto = new UserDto(1, "Username 1", "User 1", "USER");
+    when(userService.findById(anyInt())).thenReturn(userDto);
+
+    // WHEN
+    mockMvc.perform(get("/user/update/1"))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("user/update"))
+        .andExpect(model().attributeExists("userDto"))
+        .andExpect(model().attribute("userDto", userDto));
+    verify(userService, times(1)).findById(1);
+  }
+
+  @DisplayName("GET /user/update when user not found should return view with error message")
+  @Test
+  void showUpdateFormWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This user is not found")).when(userService).findById(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/user/update/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/user/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(userService, times(1)).findById(9);
+  }
+  
 }
