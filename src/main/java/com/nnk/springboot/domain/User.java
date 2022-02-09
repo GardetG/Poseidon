@@ -20,14 +20,12 @@ public class User {
   /**
    * Create an instance of User with credentials, fullName, role.
    *
-   * @param id       of the User
    * @param username of the User
    * @param password of the User
    * @param fullName of the User
    * @param role     of the User
    */
-  public User(Integer id, String username, String password, String fullName, String role) {
-    this.id = id;
+  public User(String username, String password, String fullName, String role) {
     this.username = username;
     this.password = password;
     this.fullName = fullName;
