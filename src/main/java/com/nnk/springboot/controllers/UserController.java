@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,11 +49,9 @@ public class UserController {
   }
 
   @GetMapping("/user/update/{id}")
-  public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-    User user = userRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-    user.setPassword("");
-    model.addAttribute("user", user);
+  public String showUpdateForm(@PathVariable("id") Integer id, Model model)
+      throws ResourceNotFoundException {
+    model.addAttribute("userDto", userService.findById(id));
     return "user/update";
   }
 
