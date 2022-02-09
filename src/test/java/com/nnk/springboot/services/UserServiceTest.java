@@ -17,6 +17,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,14 +32,17 @@ class UserServiceTest {
   @MockBean
   private UserRepository userRepository;
 
+  @Captor
+  private ArgumentCaptor<User> userArgumentCaptor;
+
   private User userTest;
   private UserDto userDtoTest;
 
   @BeforeEach
   void setUp() {
-    userTest = new User("Username", "Password","User" , "USER");
+    userTest = new User("Username", "Password", "User", "USER");
     userTest.setId(1);
-    userDtoTest = new UserDto(1, "Username", "User" , "USER");
+    userDtoTest = new UserDto(1, "Username", "User", "USER");
   }
 
   @DisplayName("Find all should return a list of UserDto")
@@ -97,5 +102,23 @@ class UserServiceTest {
         .hasMessage("This user is not found");
     verify(userRepository, times(1)).findById(9);
   }
-  
+
+  @DisplayName("Add a new User should persist it into database with hashed password")
+  @Test
+  void addTest() {
+    // GIVEN
+    UserDto newUser = new UserDto(0, "Username", "User", "USER");
+    newUser.setPassword("Password");
+    User expectedUser = new User("Username", "Password", "User", "USER");
+
+    // WHEN
+    userService.add(newUser);
+
+    // THEN
+    verify(userRepository, times(1)).save(userArgumentCaptor.capture());
+    assertThat(userArgumentCaptor.getValue()).usingRecursiveComparison().ignoringFields("password").isEqualTo(expectedUser);
+    assertThat(userArgumentCaptor.getValue().getPassword()).isNotBlank();
+    assertThat(userArgumentCaptor.getValue().getPassword()).isNotEqualTo(newUser.getPassword());
+  }
+
 }
