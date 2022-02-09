@@ -15,14 +15,12 @@ public class UserDto {
    *
    * @param id       of th Dto
    * @param username of th Dto
-   * @param password of th Dto
    * @param fullName of th Dto
    * @param role     of th Dto
    */
-  public UserDto(Integer id, String username, String password, String fullName, String role) {
+  public UserDto(Integer id, String username, String fullName, String role) {
     this.id = id;
     this.username = username;
-    this.password = password;
     this.fullName = fullName;
     this.role = role;
   }
