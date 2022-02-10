@@ -52,8 +52,9 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void delete(int id) {
-
+  public void delete(int id) throws ResourceNotFoundException {
+    User userToDelete = getOrThrowException(id);
+    userRepository.delete(userToDelete);
   }
 
   private User getOrThrowException(int id) throws ResourceNotFoundException {

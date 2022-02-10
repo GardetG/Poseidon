@@ -19,6 +19,6 @@ public interface UserService {
 
   void update(UserDto userDto) throws ResourceNotFoundException;
 
-  void delete(int id);
+  void delete(int id) throws ResourceNotFoundException;
 
 }
