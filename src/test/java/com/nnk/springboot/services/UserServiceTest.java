@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
