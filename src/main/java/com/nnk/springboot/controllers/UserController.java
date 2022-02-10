@@ -10,12 +10,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class UserController {
@@ -76,4 +78,12 @@ public class UserController {
     model.addAttribute("users", userRepository.findAll());
     return "redirect:/user/list";
   }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public String handleResourceNotFoundException(ResourceNotFoundException e,
+                                                RedirectAttributes redirectAttributes) {
+    redirectAttributes.addFlashAttribute("error", e.getMessage());
+    return "redirect:/user/list";
+  }
+
 }
