@@ -2,6 +2,7 @@ package com.nnk.springboot.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * User DTO between view and model for CRUD operations.
@@ -27,13 +28,17 @@ public class UserDto {
 
   private Integer id;
   @NotBlank(message = "Username is mandatory")
+  @Length(max = 125, message = "Username cannot exceed 125 characters")
   private String username;
   @NotBlank(message = "Password is mandatory")
+  @Length(max = 125, message = "Password cannot exceed 125 characters")
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String password;
   @NotBlank(message = "FullName is mandatory")
+  @Length(max = 125, message = "FullName cannot exceed 125 characters")
   private String fullName;
   @NotBlank(message = "Role is mandatory")
+  @Length(max = 125, message = "Role cannot exceed 125 characters")
   private String role;
 
   public Integer getId() {

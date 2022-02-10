@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.services.UserService;
@@ -32,17 +33,14 @@ public class UserController {
   }
 
   @GetMapping("/user/add")
-  public String addUser(User bid) {
+  public String addUser(UserDto userDto) {
     return "user/add";
   }
 
   @PostMapping("/user/validate")
-  public String validate(@Valid User user, BindingResult result, Model model) {
+  public String validate(@Valid UserDto userDto, BindingResult result, Model model) {
     if (!result.hasErrors()) {
-      BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-      user.setPassword(encoder.encode(user.getPassword()));
-      userRepository.save(user);
-      model.addAttribute("users", userRepository.findAll());
+      userService.add(userDto);
       return "redirect:/user/list";
     }
     return "user/add";
