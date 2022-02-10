@@ -177,7 +177,7 @@ class RuleNameControllerTest {
 
   @DisplayName("POST valid DTO on /ruleName/update should persist ruleName then return view")
   @Test
-  void updateCurveTest() throws Exception {
+  void updateRuleNameTest() throws Exception {
     // GIVEN
     RuleNameDto expectedDto = new RuleNameDto(1, "Update Rule Name", "Update Description", "Update Json", "Update Template", "Update SQL", "Update SQL Part");
 
@@ -201,7 +201,7 @@ class RuleNameControllerTest {
 
   @DisplayName("POST invalid DTO on /ruleName/update should return from view")
   @Test
-  void updateCurveWhenInvalidTest() throws Exception {
+  void updateRuleNameWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/ruleName/update/1")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -228,7 +228,7 @@ class RuleNameControllerTest {
 
   @DisplayName("POST DTO on /ruleName/update when ruleName not found should return view with error message")
   @Test
-  void updateCurveWhenNotFoundTest() throws Exception {
+  void updateRuleNameWhenNotFoundTest() throws Exception {
     // GIVEN
     RuleNameDto expectedDto = new RuleNameDto(9, "Update Rule Name", "Update Description", "Update Json", "Update Template", "Update SQL", "Update SQL Part");
     doThrow(new ResourceNotFoundException("This ruleName is not found")).when(ruleNameService).update(any(RuleNameDto.class));
@@ -254,7 +254,7 @@ class RuleNameControllerTest {
 
   @DisplayName("GET /ruleName/delete should delete RuleName then return view")
   @Test
-  void deleteCurveTest() throws Exception {
+  void deleteRuleNameTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/ruleName/delete/1"))
 
@@ -266,7 +266,7 @@ class RuleNameControllerTest {
 
   @DisplayName("GET /RuleName/delete when RuleName not found should return view with error message")
   @Test
-  void deleteCurveWhenNotFoundTest() throws Exception {
+  void deleteRuleNameWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This RuleName is not found")).when(ruleNameService).delete(anyInt());
 

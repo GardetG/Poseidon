@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
-import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.services.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,8 +39,6 @@ class UserControllerTest {
 
   @MockBean
   private UserService userService;
-  @MockBean
-  private UserRepository userRepository;
 
   @Captor
   private ArgumentCaptor<UserDto> dtoCaptor;
@@ -176,7 +173,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/update should persist user then return view")
   @Test
-  void updateCurveTest() throws Exception {
+  void updateUserTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(1, "Update Username", "Update User", "ADMIN");
     expectedDto.setPassword("UpdatePassword");
@@ -199,7 +196,7 @@ class UserControllerTest {
 
   @DisplayName("POST invalid DTO on /user/update should return from view")
   @Test
-  void updateCurveWhenInvalidTest() throws Exception {
+  void updateUserWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/user/update/1")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -222,7 +219,7 @@ class UserControllerTest {
 
   @DisplayName("POST DTO on /user/update when user not found should return view with error message")
   @Test
-  void updateCurveWhenNotFoundTest() throws Exception {
+  void updateUserWhenNotFoundTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(9, "Update Username", "Update User", "ADMIN");
     expectedDto.setPassword("UpdatePassword");
@@ -245,4 +242,32 @@ class UserControllerTest {
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
   
+  @DisplayName("GET /user/delete should delete User then return view")
+  @Test
+  void deleteUserTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/user/delete/1"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/user/list"));
+    verify(userService, times(1)).delete(1);
+  }
+
+  @DisplayName("GET /user/delete when User not found should return view with error message")
+  @Test
+  void deleteUserWhenNotFoundTest() throws Exception {
+    // GIVEN
+    doThrow(new ResourceNotFoundException("This User is not found")).when(userService).delete(anyInt());
+
+    // WHEN
+    mockMvc.perform(get("/user/delete/9"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/user/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(userService, times(1)).delete(9);
+  }
+
 }
