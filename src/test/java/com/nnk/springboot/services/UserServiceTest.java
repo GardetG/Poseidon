@@ -2,6 +2,7 @@ package com.nnk.springboot.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -119,6 +120,44 @@ class UserServiceTest {
     assertThat(userArgumentCaptor.getValue()).usingRecursiveComparison().ignoringFields("password").isEqualTo(expectedUser);
     assertThat(userArgumentCaptor.getValue().getPassword()).isNotBlank();
     assertThat(userArgumentCaptor.getValue().getPassword()).isNotEqualTo(newUser.getPassword());
+  }
+  
+  @DisplayName("Update a User should persist it into database")
+  @Test
+  void updateTest() throws ResourceNotFoundException {
+    // GIVEN
+    UserDto updateUser = new UserDto(1, "Update Username", "Update User", "ADMIN");
+    updateUser.setPassword("UpdatePassword");
+    User expectedUser = new User("Update Username", "UpdatePassword", "Update User", "ADMIN");
+    expectedUser.setId(1);
+    when(userRepository.findById(anyInt())).thenReturn(Optional.of(userTest));
+
+    // WHEN
+    userService.update(updateUser);
+
+    // THEN
+    verify(userRepository, times(1)).findById(1);
+    verify(userRepository, times(1)).save(userArgumentCaptor.capture());
+    assertThat(userArgumentCaptor.getValue()).usingRecursiveComparison().ignoringFields("password").isEqualTo(expectedUser);
+    assertThat(userArgumentCaptor.getValue().getPassword()).isNotBlank();
+    assertThat(userArgumentCaptor.getValue().getPassword()).isNotEqualTo(expectedUser.getPassword());
+  }
+
+  @DisplayName("Update a User when it's not found should throw an exception")
+  @Test
+  void updateWhenNotFoundTest() {
+    // GIVEN
+    UserDto updateUser = new UserDto(9, "Update Username", "Update User", "ADMIN");
+    when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> userService.update(updateUser))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This user is not found");
+    verify(userRepository, times(1)).findById(9);
+    verify(userRepository, times(0)).save(any(User.class));
   }
 
 }
