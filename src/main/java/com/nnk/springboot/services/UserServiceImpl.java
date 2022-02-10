@@ -58,8 +58,15 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void update(UserDto userDto) {
-
+  public void update(UserDto userDto) throws ResourceNotFoundException {
+    User userToUpdate = userRepository.findById(userDto.getId())
+        .orElseThrow(() -> new ResourceNotFoundException("This user is not found"));
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    userToUpdate.setUsername(userDto.getUsername());
+    userToUpdate.setPassword(encoder.encode(userDto.getPassword()));
+    userToUpdate.setFullName(userDto.getFullName());
+    userToUpdate.setRole(userDto.getRole());
+    userRepository.save(userToUpdate);
   }
 
   @Override
