@@ -4,6 +4,7 @@ import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
+import com.nnk.springboot.utils.UserMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
+  private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
   @Autowired
   private UserRepository userRepository;
 
@@ -23,55 +26,39 @@ public class UserServiceImpl implements UserService {
   public List<UserDto> findAll() {
     return userRepository.findAll()
         .stream()
-        .map(user -> new UserDto(
-            user.getId(),
-            user.getUsername(),
-            user.getFullName(),
-            user.getRole()
-        ))
+        .map(UserMapper::toDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public UserDto findById(int id) throws ResourceNotFoundException {
-    return userRepository.findById(id)
-        .map(user -> new UserDto(
-            user.getId(),
-            user.getUsername(),
-            user.getFullName(),
-            user.getRole()
-        ))
-        .orElseThrow(() -> new ResourceNotFoundException("This user is not found"));
+    return UserMapper.toDto(getOrThrowException(id));
   }
 
   @Override
   public void add(UserDto userDto) {
-    User userToAdd = new User(
-        userDto.getUsername(),
-        userDto.getPassword(),
-        userDto.getFullName(),
-        userDto.getRole()
-    );
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    User userToAdd = new User();
+    UserMapper.toEntity(userToAdd, userDto);
     userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
     userRepository.save(userToAdd);
   }
 
   @Override
   public void update(UserDto userDto) throws ResourceNotFoundException {
-    User userToUpdate = userRepository.findById(userDto.getId())
-        .orElseThrow(() -> new ResourceNotFoundException("This user is not found"));
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    userToUpdate.setUsername(userDto.getUsername());
-    userToUpdate.setPassword(encoder.encode(userDto.getPassword()));
-    userToUpdate.setFullName(userDto.getFullName());
-    userToUpdate.setRole(userDto.getRole());
+    User userToUpdate = getOrThrowException(userDto.getId());
+    UserMapper.toEntity(userToUpdate, userDto);
+    userToUpdate.setPassword(encoder.encode(userToUpdate.getPassword()));
     userRepository.save(userToUpdate);
   }
 
   @Override
   public void delete(int id) {
 
+  }
+
+  private User getOrThrowException(int id) throws ResourceNotFoundException {
+    return userRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("This user is not found"));
   }
 
 }
