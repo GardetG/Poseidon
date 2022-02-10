@@ -173,5 +173,76 @@ class UserControllerTest {
         .andExpect(flash().attributeExists("error"));
     verify(userService, times(1)).findById(9);
   }
+
+  @DisplayName("POST valid DTO on /user/update should persist user then return view")
+  @Test
+  void updateCurveTest() throws Exception {
+    // GIVEN
+    UserDto expectedDto = new UserDto(1, "Update Username", "Update User", "ADMIN");
+    expectedDto.setPassword("UpdatePassword");
+
+    // WHEN
+    mockMvc.perform(post("/user/update/1")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", expectedDto.getUsername())
+            .param("password", expectedDto.getPassword())
+            .param("fullName", expectedDto.getFullName())
+            .param("role", expectedDto.getRole())
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/user/list"));
+    verify(userService, times(1)).update(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
+  @DisplayName("POST invalid DTO on /user/update should return from view")
+  @Test
+  void updateCurveWhenInvalidTest() throws Exception {
+    // WHEN
+    mockMvc.perform(post("/user/update/1")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username","This user's username exceed the 125 characters limit " +
+                "to test the validation of the Dto when the add User form is submit by the user")
+            .param("password", "")
+            .param("fullName", "")
+            .param("role", "")
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("user/update"))
+        .andExpect(model().attributeHasFieldErrors("userDto", "username"))
+        .andExpect(model().attributeHasFieldErrors("userDto", "password"))
+        .andExpect(model().attributeHasFieldErrors("userDto", "fullName"))
+        .andExpect(model().attributeHasFieldErrors("userDto", "role"));
+    verify(userService, times(0)).update(any(UserDto.class));
+  }
+
+  @DisplayName("POST DTO on /user/update when user not found should return view with error message")
+  @Test
+  void updateCurveWhenNotFoundTest() throws Exception {
+    // GIVEN
+    UserDto expectedDto = new UserDto(9, "Update Username", "Update User", "ADMIN");
+    expectedDto.setPassword("UpdatePassword");
+    doThrow(new ResourceNotFoundException("This user is not found")).when(userService).update(any(UserDto.class));
+
+    // WHEN
+    mockMvc.perform(post("/user/update/9")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", expectedDto.getUsername())
+            .param("password", expectedDto.getPassword())
+            .param("fullName", expectedDto.getFullName())
+            .param("role", expectedDto.getRole())
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/user/list"))
+        .andExpect(flash().attributeExists("error"));
+    verify(userService, times(1)).update(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
   
 }
