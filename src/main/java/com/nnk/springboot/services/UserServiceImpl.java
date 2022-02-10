@@ -1,11 +1,13 @@
 package com.nnk.springboot.services;
 
+import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,7 +46,15 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void add(UserDto userDto) {
-
+    User userToAdd = new User(
+        userDto.getUsername(),
+        userDto.getPassword(),
+        userDto.getFullName(),
+        userDto.getRole()
+    );
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
+    userRepository.save(userToAdd);
   }
 
   @Override
