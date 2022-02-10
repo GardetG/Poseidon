@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
@@ -158,6 +159,37 @@ class UserServiceTest {
         .hasMessage("This user is not found");
     verify(userRepository, times(1)).findById(9);
     verify(userRepository, times(0)).save(any(User.class));
+  }
+  
+  @DisplayName("Delete a User should delete it from database")
+  @Test
+  void deleteTest() throws ResourceNotFoundException {
+    // GIVEN
+    when(userRepository.findById(anyInt())).thenReturn(Optional.of(userTest));
+
+    // WHEN
+    userService.delete(1);
+
+    // THEN
+    verify(userRepository, times(1)).findById(1);
+    verify(userRepository, times(1)).delete(userArgumentCaptor.capture());
+    assertThat(userArgumentCaptor.getValue()).isEqualTo(userTest);
+  }
+
+  @DisplayName("Delete a User when it's not found should throw an exception")
+  @Test
+  void deleteWhenNotFoundTest() {
+    // GIVEN
+    when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> userService.delete(9))
+
+        // THEN
+        .isInstanceOf(ResourceNotFoundException.class)
+        .hasMessage("This user is not found");
+    verify(userRepository, times(1)).findById(9);
+    verify(userRepository, times(0)).delete(any(User.class));
   }
 
 }
