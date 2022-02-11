@@ -2,6 +2,7 @@ package com.nnk.springboot.services;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.utils.UserMapper;
@@ -51,7 +52,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * {@inheritDoc}
    */
   @Override
-  public void add(UserDto userDto) {
+  public void add(UserDto userDto) throws ResourceAlreadyExistsException {
+    if (userRepository.existsByUsername(userDto.getUsername())) {
+      throw new ResourceAlreadyExistsException("This username is already used");
+    }
     User userToAdd = new User();
     UserMapper.toEntity(userToAdd, userDto);
     userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
@@ -62,8 +66,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    * {@inheritDoc}
    */
   @Override
-  public void update(UserDto userDto) throws ResourceNotFoundException {
+  public void update(UserDto userDto)
+      throws ResourceNotFoundException, ResourceAlreadyExistsException {
     User userToUpdate = getOrThrowException(userDto.getId());
+    if (!userDto.getUsername().equals(userToUpdate.getUsername()) && userRepository.existsByUsername(userDto.getUsername())) {
+      throw new ResourceAlreadyExistsException("This username is already used");
+    }
     UserMapper.toEntity(userToUpdate, userDto);
     userToUpdate.setPassword(encoder.encode(userToUpdate.getPassword()));
     userRepository.save(userToUpdate);
