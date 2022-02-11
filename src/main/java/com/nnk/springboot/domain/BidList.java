@@ -18,7 +18,7 @@ public class BidList {
   public BidList() { }
 
   /**
-   * Create an instance of BidList with account, type and bid qantity.
+   * Create an instance of BidList with account, type and bid quantity.
    *
    * @param account     of the Bid
    * @param type        of the Bid

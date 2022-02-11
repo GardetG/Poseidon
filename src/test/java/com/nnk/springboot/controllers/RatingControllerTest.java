@@ -169,7 +169,7 @@ class RatingControllerTest {
 
   @DisplayName("POST valid DTO on /rating/update should persist rating then return view")
   @Test
-  void updateCurveTest() throws Exception {
+  void updateRatingTest() throws Exception {
     // GIVEN
     RatingDto expectedDto = new RatingDto(1, "Update Moody's Rating", "Update S&P Rating", "Update Fitch Rating", 11);
 
@@ -191,7 +191,7 @@ class RatingControllerTest {
 
   @DisplayName("POST invalid DTO on /rating/update should return from view")
   @Test
-  void updateCurveWhenInvalidTest() throws Exception {
+  void updateRatingWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/rating/update/1")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -213,7 +213,7 @@ class RatingControllerTest {
 
   @DisplayName("POST DTO on /rating/update when rating not found should return view with error message")
   @Test
-  void updateCurveWhenNotFoundTest() throws Exception {
+  void updateRatingWhenNotFoundTest() throws Exception {
     // GIVEN
     RatingDto expectedDto = new RatingDto(9, "Update Moody's Rating", "Update S&P Rating", "Update Fitch Rating", 11);
     doThrow(new ResourceNotFoundException("This rating is not found")).when(ratingService).update(any(RatingDto.class));
@@ -237,7 +237,7 @@ class RatingControllerTest {
 
   @DisplayName("GET /rating/delete should delete Rating then return view")
   @Test
-  void deleteCurveTest() throws Exception {
+  void deleteRatingTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/rating/delete/1"))
 
@@ -249,7 +249,7 @@ class RatingControllerTest {
 
   @DisplayName("GET /Rating/delete when Rating not found should return view with error message")
   @Test
-  void deleteCurveWhenNotFoundTest() throws Exception {
+  void deleteRatingWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This Rating is not found")).when(ratingService).delete(anyInt());
 

@@ -168,7 +168,7 @@ class TradeControllerTest {
 
   @DisplayName("POST valid DTO on /trade/update should persist trade then return view")
   @Test
-  void updateCurveTest() throws Exception {
+  void updateTradeTest() throws Exception {
     // GIVEN
     TradeDto expectedDto = new TradeDto(1, "Update Trade Account", "Update Type", 20d);
 
@@ -189,7 +189,7 @@ class TradeControllerTest {
 
   @DisplayName("POST invalid DTO on /trade/update should return from view")
   @Test
-  void updateCurveWhenInvalidTest() throws Exception {
+  void updateTradeWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/trade/update/1")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -209,7 +209,7 @@ class TradeControllerTest {
 
   @DisplayName("POST DTO on /trade/update when trade not found should return view with error message")
   @Test
-  void updateCurveWhenNotFoundTest() throws Exception {
+  void updateTradeWhenNotFoundTest() throws Exception {
     // GIVEN
     TradeDto expectedDto = new TradeDto(9, "Update Trade Account", "Update Type", 20d);
     doThrow(new ResourceNotFoundException("This trade is not found")).when(tradeService).update(any(TradeDto.class));
@@ -232,7 +232,7 @@ class TradeControllerTest {
 
   @DisplayName("GET /trade/delete should delete Trade then return view")
   @Test
-  void deleteCurveTest() throws Exception {
+  void deleteTradeTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/trade/delete/1"))
 
@@ -244,7 +244,7 @@ class TradeControllerTest {
 
   @DisplayName("GET /Trade/delete when Trade not found should return view with error message")
   @Test
-  void deleteCurveWhenNotFoundTest() throws Exception {
+  void deleteTradeWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This Trade is not found")).when(tradeService).delete(anyInt());
 
