@@ -95,7 +95,7 @@ class UserControllerTest {
   void validateTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(null, "Username 1", "User 1", "USER");
-    expectedDto.setPassword("Password");
+    expectedDto.setPassword("PasswdA1=");
 
     // WHEN
     mockMvc.perform(post("/user/validate")
@@ -121,7 +121,7 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .param("username","This user's username exceed the 125 characters limit " +
                 "to test the validation of the Dto when the add User form is submit by the user")
-            .param("password", "")
+            .param("password", "password")
             .param("fullName", "")
             .param("role", "")
             .with(csrf()))
@@ -176,7 +176,7 @@ class UserControllerTest {
   void updateUserTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(1, "Update Username", "Update User", "ADMIN");
-    expectedDto.setPassword("UpdatePassword");
+    expectedDto.setPassword("UpdatePasswdA1=");
 
     // WHEN
     mockMvc.perform(post("/user/update/1")
@@ -222,7 +222,7 @@ class UserControllerTest {
   void updateUserWhenNotFoundTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(9, "Update Username", "Update User", "ADMIN");
-    expectedDto.setPassword("UpdatePassword");
+    expectedDto.setPassword("UpdatePasswdA1=");
     doThrow(new ResourceNotFoundException("This user is not found")).when(userService).update(any(UserDto.class));
 
     // WHEN
