@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,12 +24,14 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @SpringBootTest
 class UserServiceTest {
 
   @Autowired
-  private UserService userService;
+  private UserServiceImpl userService;
 
   @MockBean
   private UserRepository userRepository;
@@ -189,6 +192,34 @@ class UserServiceTest {
         .hasMessage("This user is not found");
     verify(userRepository, times(1)).findById(9);
     verify(userRepository, times(0)).delete(any(User.class));
+  }
+
+  @DisplayName("Load a User by Username should return it from database")
+  @Test
+  void loadUserByUsernameTest() {
+    // GIVEN
+    when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(userTest));
+
+    // WHEN
+    UserDetails actualUser = userService.loadUserByUsername("Username");
+
+    // THEN
+    verify(userRepository, times(1)).findByUsername("Username");
+    assertThat(actualUser).isEqualTo(userTest);
+  }
+
+  @DisplayName("Load a User by Username when it's not found should throw an exception")
+  @Test
+  void loadUserByUsernameWhenNotFoundTest() {
+    // GIVEN
+    when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+
+    // WHEN
+    assertThatThrownBy(() -> userService.loadUserByUsername("NonExistentUser"))
+
+        // THEN
+        .isInstanceOf(UsernameNotFoundException.class);
+    verify(userRepository, times(1)).findByUsername("NonExistentUser");
   }
 
 }
