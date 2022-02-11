@@ -29,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(UserController.class)
@@ -39,12 +42,26 @@ class UserControllerTest {
 
   @MockBean
   private UserService userService;
+  @MockBean
+  private UserDetailsService userDetailsService;
 
   @Captor
   private ArgumentCaptor<UserDto> dtoCaptor;
 
+  @DisplayName("GET /user/list when not authenticate should allow access")
+  @Test
+  @WithAnonymousUser
+  void homeWhenNotAuthenticateTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/user/list"))
+
+        // THEN
+        .andExpect(status().isOk());
+  }
+
   @DisplayName("GET /user/list should return view with list of User as attribute")
   @Test
+  @WithMockUser(username="user")
   void homeTest() throws Exception {
     // GIVEN
     List<UserDto> DtoList = new ArrayList<>();
@@ -63,24 +80,9 @@ class UserControllerTest {
     assertThat(DtoList).extracting("password").containsOnlyNulls();
   }
 
-  @DisplayName("GET /user/list with no User in database should return view with empty list as attribute")
-  @Test
-  void homeWhenEmptyTest() throws Exception {
-    // GIVEN
-    when(userService.findAll()).thenReturn(Collections.emptyList());
-
-    // WHEN
-    mockMvc.perform(get("/user/list"))
-
-        // THEN
-        .andExpect(status().isOk())
-        .andExpect(view().name("user/list"))
-        .andExpect(model().attributeExists("users"))
-        .andExpect(model().attribute("users", Collections.emptyList()));
-  }
-
   @DisplayName("GET /user/add should return view")
   @Test
+  @WithMockUser(username="user") 
   void addUserFormTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/user/add"))
@@ -92,6 +94,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/validate should persist User then return view")
   @Test
+  @WithMockUser(username="user") 
   void validateTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(null, "Username 1", "User 1", "USER");
@@ -115,6 +118,7 @@ class UserControllerTest {
 
   @DisplayName("POST invalid DTO on /user/validate should return form view")
   @Test
+  @WithMockUser(username="user") 
   void validateWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/user/validate")
@@ -138,6 +142,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/update should return view")
   @Test
+  @WithMockUser(username="user") 
   void showUpdateFormTest() throws Exception {
     // GIVEN
     UserDto userDto = new UserDto(1, "Username 1", "User 1", "USER");
@@ -157,6 +162,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/update when user not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void showUpdateFormWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This user is not found")).when(userService).findById(anyInt());
@@ -173,6 +179,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/update should persist user then return view")
   @Test
+  @WithMockUser(username="user") 
   void updateUserTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(1, "Update Username", "Update User", "ADMIN");
@@ -196,6 +203,7 @@ class UserControllerTest {
 
   @DisplayName("POST invalid DTO on /user/update should return from view")
   @Test
+  @WithMockUser(username="user") 
   void updateUserWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/user/update/1")
@@ -219,6 +227,7 @@ class UserControllerTest {
 
   @DisplayName("POST DTO on /user/update when user not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void updateUserWhenNotFoundTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(9, "Update Username", "Update User", "ADMIN");
@@ -244,6 +253,7 @@ class UserControllerTest {
   
   @DisplayName("GET /user/delete should delete User then return view")
   @Test
+  @WithMockUser(username="user") 
   void deleteUserTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/user/delete/1"))
@@ -256,6 +266,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/delete when User not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void deleteUserWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This User is not found")).when(userService).delete(anyInt());

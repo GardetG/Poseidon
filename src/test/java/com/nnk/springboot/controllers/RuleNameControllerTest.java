@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -29,7 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(RuleNameController.class)
 class RuleNameControllerTest {
@@ -39,12 +44,27 @@ class RuleNameControllerTest {
 
   @MockBean
   private RuleNameService ruleNameService;
+  @MockBean
+  private UserDetailsService userDetailsService;
 
   @Captor
   private ArgumentCaptor<RuleNameDto> dtoCaptor;
 
+  @DisplayName("GET /ruleName/list when not authenticate should redirect to login")
+  @Test
+  @WithAnonymousUser
+  void homeWhenNotAuthenticateTest() throws Exception {
+    // WHEN
+    ResultActions response = mockMvc.perform(get("/ruleName/list"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(redirectedUrl("http://localhost/login"));
+  }
+  
   @DisplayName("GET /ruleName/list should return view with list of RuleName as attribute")
   @Test
+  @WithMockUser(username="user")
   void homeTest() throws Exception {
     // GIVEN
     List<RuleNameDto> DtoList = new ArrayList<>();
@@ -62,24 +82,9 @@ class RuleNameControllerTest {
         .andExpect(model().attribute("ruleNames", DtoList));
   }
 
-  @DisplayName("GET /ruleName/list with no RuleName in database should return view with empty list as attribute")
-  @Test
-  void homeWhenEmptyTest() throws Exception {
-    // GIVEN
-    when(ruleNameService.findAll()).thenReturn(Collections.emptyList());
-
-    // WHEN
-    mockMvc.perform(get("/ruleName/list"))
-
-        // THEN
-        .andExpect(status().isOk())
-        .andExpect(view().name("ruleName/list"))
-        .andExpect(model().attributeExists("ruleNames"))
-        .andExpect(model().attribute("ruleNames", Collections.emptyList()));
-  }
-
   @DisplayName("GET /ruleName/add should return view")
   @Test
+  @WithMockUser(username="user") 
   void addRuleNameFormTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/ruleName/add"))
@@ -91,6 +96,7 @@ class RuleNameControllerTest {
 
   @DisplayName("POST valid DTO on /ruleName/validate should persist RuleName then return view")
   @Test
+  @WithMockUser(username="user") 
   void validateTest() throws Exception {
     // GIVEN
     RuleNameDto
@@ -116,6 +122,7 @@ class RuleNameControllerTest {
 
   @DisplayName("POST invalid DTO on /ruleName/validate should return form view")
   @Test
+  @WithMockUser(username="user") 
   void validateWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/ruleName/validate")
@@ -143,6 +150,7 @@ class RuleNameControllerTest {
 
   @DisplayName("GET /ruleName/update should return view")
   @Test
+  @WithMockUser(username="user") 
   void showUpdateFormTest() throws Exception {
     // GIVEN
     RuleNameDto ruleNameDto = new RuleNameDto(1, "Rule Name", "Description", "Json", "Template", "SQL", "SQL Part");
@@ -161,6 +169,7 @@ class RuleNameControllerTest {
 
   @DisplayName("GET /ruleName/update when ruleName not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void showUpdateFormWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This ruleName is not found")).when(ruleNameService).findById(anyInt());
@@ -177,6 +186,7 @@ class RuleNameControllerTest {
 
   @DisplayName("POST valid DTO on /ruleName/update should persist ruleName then return view")
   @Test
+  @WithMockUser(username="user") 
   void updateRuleNameTest() throws Exception {
     // GIVEN
     RuleNameDto expectedDto = new RuleNameDto(1, "Update Rule Name", "Update Description", "Update Json", "Update Template", "Update SQL", "Update SQL Part");
@@ -201,6 +211,7 @@ class RuleNameControllerTest {
 
   @DisplayName("POST invalid DTO on /ruleName/update should return from view")
   @Test
+  @WithMockUser(username="user") 
   void updateRuleNameWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/ruleName/update/1")
@@ -228,6 +239,7 @@ class RuleNameControllerTest {
 
   @DisplayName("POST DTO on /ruleName/update when ruleName not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void updateRuleNameWhenNotFoundTest() throws Exception {
     // GIVEN
     RuleNameDto expectedDto = new RuleNameDto(9, "Update Rule Name", "Update Description", "Update Json", "Update Template", "Update SQL", "Update SQL Part");
@@ -254,6 +266,7 @@ class RuleNameControllerTest {
 
   @DisplayName("GET /ruleName/delete should delete RuleName then return view")
   @Test
+  @WithMockUser(username="user") 
   void deleteRuleNameTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/ruleName/delete/1"))
@@ -266,6 +279,7 @@ class RuleNameControllerTest {
 
   @DisplayName("GET /RuleName/delete when RuleName not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void deleteRuleNameWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This RuleName is not found")).when(ruleNameService).delete(anyInt());
