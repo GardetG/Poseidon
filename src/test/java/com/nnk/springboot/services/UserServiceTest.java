@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 import java.util.Collections;
@@ -109,7 +110,7 @@ class UserServiceTest {
 
   @DisplayName("Add a new User should persist it into database with hashed password")
   @Test
-  void addTest() {
+  void addTest() throws ResourceAlreadyExistsException {
     // GIVEN
     UserDto newUser = new UserDto(0, "Username", "User", "USER");
     newUser.setPassword("Password");
@@ -124,10 +125,27 @@ class UserServiceTest {
     assertThat(userArgumentCaptor.getValue().getPassword()).isNotBlank();
     assertThat(userArgumentCaptor.getValue().getPassword()).isNotEqualTo(newUser.getPassword());
   }
+
+  @DisplayName("Add a new User when username already exists should throw an exception")
+  @Test
+  void addWhenUsernameAlreadyExistsTest() {
+    // GIVEN
+    UserDto newUser = new UserDto(0, "ExistingUsername", "User", "USER");
+    when(userRepository.existsByUsername(anyString())).thenReturn(true);
+
+    // WHEN
+    assertThatThrownBy(() -> userService.add(newUser))
+
+        // THEN
+        .isInstanceOf(ResourceAlreadyExistsException.class)
+        .hasMessage("This username is already used");
+    verify(userRepository, times(0)).save(any(User.class));
+    verify(userRepository, times(1)).existsByUsername("ExistingUsername");
+  }
   
   @DisplayName("Update a User should persist it into database")
   @Test
-  void updateTest() throws ResourceNotFoundException {
+  void updateTest() throws ResourceNotFoundException, ResourceAlreadyExistsException {
     // GIVEN
     UserDto updateUser = new UserDto(1, "Update Username", "Update User", "ADMIN");
     updateUser.setPassword("UpdatePassword");
@@ -146,6 +164,26 @@ class UserServiceTest {
     assertThat(userArgumentCaptor.getValue().getPassword()).isNotEqualTo(expectedUser.getPassword());
   }
 
+  @DisplayName("Update a User when username already exists should throw an exception")
+  @Test
+  void updateWhenUsernameAlreadyExistsTest() {
+    // GIVEN
+    UserDto updateUser = new UserDto(1, "Update ExistingUsername", "Update User", "ADMIN");
+    updateUser.setPassword("UpdatePassword");
+    when(userRepository.findById(anyInt())).thenReturn(Optional.of(userTest));
+    when(userRepository.existsByUsername(anyString())).thenReturn(true);
+
+    // WHEN
+    assertThatThrownBy(() -> userService.update(updateUser))
+
+        // THEN
+        .isInstanceOf(ResourceAlreadyExistsException.class)
+        .hasMessage("This username is already used");
+    verify(userRepository, times(1)).findById(1);
+    verify(userRepository, times(1)).existsByUsername("Update ExistingUsername");
+    verify(userRepository, times(0)).save(any(User.class));
+  }
+
   @DisplayName("Update a User when it's not found should throw an exception")
   @Test
   void updateWhenNotFoundTest() {
@@ -162,7 +200,7 @@ class UserServiceTest {
     verify(userRepository, times(1)).findById(9);
     verify(userRepository, times(0)).save(any(User.class));
   }
-  
+
   @DisplayName("Delete a User should delete it from database")
   @Test
   void deleteTest() throws ResourceNotFoundException {
