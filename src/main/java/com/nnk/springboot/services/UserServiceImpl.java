@@ -53,9 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
    */
   @Override
   public void add(UserDto userDto) throws ResourceAlreadyExistsException {
-    if (userRepository.existsByUsername(userDto.getUsername())) {
-      throw new ResourceAlreadyExistsException("This username is already used");
-    }
+    checkUsernameUnique(userDto.getUsername());
     User userToAdd = new User();
     UserMapper.toEntity(userToAdd, userDto);
     userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
@@ -69,8 +67,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public void update(UserDto userDto)
       throws ResourceNotFoundException, ResourceAlreadyExistsException {
     User userToUpdate = getOrThrowException(userDto.getId());
-    if (!userDto.getUsername().equals(userToUpdate.getUsername()) && userRepository.existsByUsername(userDto.getUsername())) {
-      throw new ResourceAlreadyExistsException("This username is already used");
+    if (!userDto.getUsername().equals(userToUpdate.getUsername())) {
+      checkUsernameUnique(userDto.getUsername());
     }
     UserMapper.toEntity(userToUpdate, userDto);
     userToUpdate.setPassword(encoder.encode(userToUpdate.getPassword()));
@@ -105,6 +103,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
           LOGGER.error("The User with id {} is not found", id);
           return new ResourceNotFoundException("This user is not found");
         });
+  }
+
+  private void checkUsernameUnique(String username) throws ResourceAlreadyExistsException {
+    if (userRepository.existsByUsername(username)) {
+      throw new ResourceAlreadyExistsException("This username is already used");
+    }
   }
 
 }
