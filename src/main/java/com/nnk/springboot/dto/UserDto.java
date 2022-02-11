@@ -2,6 +2,7 @@ package com.nnk.springboot.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.Length;
 
 /**
@@ -31,7 +32,10 @@ public class UserDto {
   @Length(max = 125, message = "Username cannot exceed 125 characters")
   private String username;
   @NotBlank(message = "Password is mandatory")
+  @Length(min = 8, message = "Password must be at least 8 characters")
   @Length(max = 125, message = "Password cannot exceed 125 characters")
+  @Pattern(regexp = "^(?=.*\\d)(?=.*[A-Z])(?=.*\\W)(?!.*\\s).{8,125}$",
+      message = "Password must contains one capital letter, one digit and one special characters")
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String password;
   @NotBlank(message = "FullName is mandatory")
