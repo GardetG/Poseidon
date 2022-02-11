@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.UserService;
 import javax.validation.Valid;
@@ -63,12 +64,16 @@ public class UserController {
    * @return View
    */
   @PostMapping("/user/validate")
-  public String validate(@Valid UserDto userDto, BindingResult result) {
+  public String validate(@Valid UserDto userDto, BindingResult result, Model model) {
     LOGGER.info("Request add User form validation");
     if (!result.hasErrors()) {
-      userService.add(userDto);
-      LOGGER.info("User successfully added");
-      return "redirect:/user/list";
+      try {
+        userService.add(userDto);
+        LOGGER.info("User successfully added");
+        return "redirect:/user/list";
+      } catch (ResourceAlreadyExistsException e) {
+        model.addAttribute("error", e.getMessage());
+      }
     }
     LOGGER.info("Failed to add User, form contains errors");
     return "user/add";
@@ -103,16 +108,20 @@ public class UserController {
    */
   @PostMapping("/user/update/{id}")
   public String updateUser(@PathVariable("id") Integer id, @Valid UserDto userDto,
-                           BindingResult result) throws ResourceNotFoundException {
+                           BindingResult result, Model model) throws ResourceNotFoundException {
     LOGGER.info("Request update User id {} form validation", id);
-    if (result.hasErrors()) {
-      LOGGER.info("Failed to update User id {}, form contains errors", id);
-      return "user/update";
+    if (!result.hasErrors()) {
+      try {
+        userDto.setId(id);
+        userService.update(userDto);
+        LOGGER.info("User id {} successfully updated", id);
+        return "redirect:/user/list";
+      } catch (ResourceAlreadyExistsException e) {
+        model.addAttribute("error", e.getMessage());
+      }
     }
-    userDto.setId(id);
-    userService.update(userDto);
-    LOGGER.info("User id {} successfully updated", id);
-    return "redirect:/user/list";
+    LOGGER.info("Failed to update User id {}, form contains errors", id);
+    return "user/update";
   }
 
   /**
