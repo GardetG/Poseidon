@@ -107,6 +107,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
   private void checkUsernameUnique(String username) throws ResourceAlreadyExistsException {
     if (userRepository.existsByUsername(username)) {
+      LOGGER.error("The username {} is already used", username);
       throw new ResourceAlreadyExistsException("This username is already used");
     }
   }

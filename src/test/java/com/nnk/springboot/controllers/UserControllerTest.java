@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.UserService;
 import java.util.ArrayList;
@@ -116,6 +117,32 @@ class UserControllerTest {
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
 
+  @DisplayName("POST valid DTO on /user/validate when username already existed should return from view with error message")
+  @Test
+  @WithMockUser(username="user")
+  void validateWhenUsernameAlreadyExistsTest() throws Exception {
+    // GIVEN
+    UserDto expectedDto = new UserDto(null, "ExistingUsername", "User 1", "USER");
+    expectedDto.setPassword("PasswdA1=");
+    doThrow(new ResourceAlreadyExistsException("dfdf")).when(userService).add(any(UserDto.class));
+
+    // WHEN
+    mockMvc.perform(post("/user/validate")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", expectedDto.getUsername())
+            .param("password", expectedDto.getPassword())
+            .param("fullName", expectedDto.getFullName())
+            .param("role", expectedDto.getRole())
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("user/add"))
+        .andExpect(model().attributeExists("error"));
+    verify(userService, times(1)).add(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
   @DisplayName("POST invalid DTO on /user/validate should return form view")
   @Test
   @WithMockUser(username="user") 
@@ -201,6 +228,32 @@ class UserControllerTest {
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
 
+  @DisplayName("POST valid DTO on /user/update when username already existed should return from view with error message")
+  @Test
+  @WithMockUser(username="user")
+  void updateWhenUsernameAlreadyExistsTest() throws Exception {
+    // GIVEN
+    UserDto expectedDto = new UserDto(1, "Update ExistingUsername", "Update User", "ADMIN");
+    expectedDto.setPassword("UpdatePasswdA1=");
+    doThrow(new ResourceAlreadyExistsException("dfdf")).when(userService).update(any(UserDto.class));
+
+    // WHEN
+    mockMvc.perform(post("/user/update/1")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", expectedDto.getUsername())
+            .param("password", expectedDto.getPassword())
+            .param("fullName", expectedDto.getFullName())
+            .param("role", expectedDto.getRole())
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("user/update"))
+        .andExpect(model().attributeExists("error"));
+    verify(userService, times(1)).update(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
   @DisplayName("POST invalid DTO on /user/update should return from view")
   @Test
   @WithMockUser(username="user") 
@@ -250,7 +303,7 @@ class UserControllerTest {
     verify(userService, times(1)).update(dtoCaptor.capture());
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
-  
+
   @DisplayName("GET /user/delete should delete User then return view")
   @Test
   @WithMockUser(username="user") 
