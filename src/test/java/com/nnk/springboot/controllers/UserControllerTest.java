@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -20,7 +21,6 @@ import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.UserService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ class UserControllerTest {
   @Captor
   private ArgumentCaptor<UserDto> dtoCaptor;
 
-  @DisplayName("GET /user/list when not authenticate should allow access")
+  @DisplayName("GET /user/list when not authenticate should redirect to login")
   @Test
   @WithAnonymousUser
   void homeWhenNotAuthenticateTest() throws Exception {
@@ -57,12 +57,24 @@ class UserControllerTest {
     mockMvc.perform(get("/user/list"))
 
         // THEN
-        .andExpect(status().isOk());
+        .andExpect(status().isFound())
+        .andExpect(redirectedUrl("http://localhost/login"));
+  }
+
+  @DisplayName("GET /user/list when authenticate as user should allow access")
+  @Test
+  @WithMockUser(username="user", roles = "USER")
+  void homeWhenAuthenticateAsUserTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/user/list"))
+
+        // THEN
+        .andExpect(status().isForbidden());
   }
 
   @DisplayName("GET /user/list should return view with list of User as attribute")
   @Test
-  @WithMockUser(username="user")
+  @WithMockUser(username="admin", roles = "ADMIN")
   void homeTest() throws Exception {
     // GIVEN
     List<UserDto> DtoList = new ArrayList<>();
@@ -83,7 +95,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/add should return view")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void addUserFormTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/user/add"))
@@ -95,7 +107,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/validate should persist User then return view")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void validateTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(null, "Username 1", "User 1", "USER");
@@ -119,7 +131,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/validate when username already existed should return from view with error message")
   @Test
-  @WithMockUser(username="user")
+  @WithMockUser(username="admin", roles = "ADMIN")
   void validateWhenUsernameAlreadyExistsTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(null, "ExistingUsername", "User 1", "USER");
@@ -145,7 +157,7 @@ class UserControllerTest {
 
   @DisplayName("POST invalid DTO on /user/validate should return form view")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void validateWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/user/validate")
@@ -169,7 +181,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/update should return view")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void showUpdateFormTest() throws Exception {
     // GIVEN
     UserDto userDto = new UserDto(1, "Username 1", "User 1", "USER");
@@ -189,7 +201,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/update when user not found should return view with error message")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void showUpdateFormWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This user is not found")).when(userService).findById(anyInt());
@@ -206,7 +218,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/update should persist user then return view")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void updateUserTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(1, "Update Username", "Update User", "ADMIN");
@@ -230,7 +242,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/update when username already existed should return from view with error message")
   @Test
-  @WithMockUser(username="user")
+  @WithMockUser(username="admin", roles = "ADMIN")
   void updateWhenUsernameAlreadyExistsTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(1, "Update ExistingUsername", "Update User", "ADMIN");
@@ -256,7 +268,7 @@ class UserControllerTest {
 
   @DisplayName("POST invalid DTO on /user/update should return from view")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void updateUserWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/user/update/1")
@@ -280,7 +292,7 @@ class UserControllerTest {
 
   @DisplayName("POST DTO on /user/update when user not found should return view with error message")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void updateUserWhenNotFoundTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(9, "Update Username", "Update User", "ADMIN");
@@ -306,7 +318,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/delete should delete User then return view")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void deleteUserTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/user/delete/1"))
@@ -319,7 +331,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/delete when User not found should return view with error message")
   @Test
-  @WithMockUser(username="user") 
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void deleteUserWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This User is not found")).when(userService).delete(anyInt());
