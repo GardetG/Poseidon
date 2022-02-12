@@ -28,13 +28,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
         .authorizeRequests()
-        .antMatchers("/css/**").permitAll()
-        .antMatchers("/", "/user/*").permitAll()
-        .anyRequest().authenticated()
+          .antMatchers("/css/**").permitAll()
+          .antMatchers("/", "/register").permitAll()
+          .antMatchers("/user/**").hasRole("ADMIN")
+          .anyRequest().authenticated()
         .and()
-        .formLogin()
+          .formLogin()
+          .loginProcessingUrl("/login")
+          .defaultSuccessUrl("/bidList/list", true)
         .and()
-        .logout();
+          .logout()
+          .logoutUrl("/app-logout")
+          .logoutSuccessUrl("/");
   }
 
   @Bean
