@@ -136,7 +136,7 @@ class UserControllerTest {
     // GIVEN
     UserDto expectedDto = new UserDto(null, "ExistingUsername", "User 1", "USER");
     expectedDto.setPassword("PasswdA1=");
-    doThrow(new ResourceAlreadyExistsException("dfdf")).when(userService).add(any(UserDto.class));
+    doThrow(new ResourceAlreadyExistsException("This username is already used")).when(userService).add(any(UserDto.class));
 
     // WHEN
     mockMvc.perform(post("/user/validate")
@@ -247,7 +247,7 @@ class UserControllerTest {
     // GIVEN
     UserDto expectedDto = new UserDto(1, "Update ExistingUsername", "Update User", "ADMIN");
     expectedDto.setPassword("UpdatePasswdA1=");
-    doThrow(new ResourceAlreadyExistsException("dfdf")).when(userService).update(any(UserDto.class));
+    doThrow(new ResourceAlreadyExistsException("This username is already used")).when(userService).update(any(UserDto.class));
 
     // WHEN
     mockMvc.perform(post("/user/update/1")
