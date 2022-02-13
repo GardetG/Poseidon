@@ -37,6 +37,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
           .loginProcessingUrl("/login")
           .defaultSuccessUrl("/bidList/list", true)
         .and()
+          .oauth2Login()
+          .defaultSuccessUrl("/bidList/list", true)
+        .and()
           .logout()
           .logoutUrl("/app-logout")
           .logoutSuccessUrl("/");
