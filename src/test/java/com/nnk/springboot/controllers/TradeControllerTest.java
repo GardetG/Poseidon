@@ -1,6 +1,5 @@
 package com.nnk.springboot.controllers;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -31,6 +30,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,6 +48,8 @@ class TradeControllerTest {
   private TradeService tradeService;
   @MockBean
   private UserDetailsService userDetailsService;
+  @MockBean
+  private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
   @Captor
   private ArgumentCaptor<TradeDto> dtoCaptor;

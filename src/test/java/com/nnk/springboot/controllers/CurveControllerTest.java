@@ -20,7 +20,6 @@ import com.nnk.springboot.dto.CurvePointDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.CurvePointService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +30,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,6 +48,8 @@ class CurveControllerTest {
   private CurvePointService curvePointService;
   @MockBean
   private UserDetailsService userDetailsService;
+  @MockBean
+  private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
   @Captor
   ArgumentCaptor<CurvePointDto> dtoCaptor;
