@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<title>Home</title>
+<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+</head>
+<body>
+<div class="container">
+
+	<div class="row">
+		<h2>Define a Password</h2>
+	</div>
+	<div class="row">
+		<form action="#" th:action="@{/OAuthRegister/validate}" th:object="${userDto}" method="post" class="form-horizontal" style="width: 100%">
+			<div>
+				<p>You are logged with a third party authentication provider as : <b th:inline="text" class="user"> [[${#httpServletRequest.remoteUser}]] </b></p>
+				<p>You can define a password to easily login with your username and password:</p>
+			</div>
+			<div class="form-group">
+				<label for="password" class="col-sm-2 control-label">Password</label>
+				<div class="col-sm-10">
+					<input type="password" th:field="*{password}" id="password" placeholder="Password" class="col-4">
+					<p class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="col-sm-12">
+					<input type="hidden" th:field="*{id}">
+					<input type="hidden" th:field="*{username}">
+					<input type="hidden" th:field="*{fullName}">
+					<input type="hidden" th:field="*{role}">
+					<a class="btn btn-danger btn-sm" href="/bidList/list">Skip</a>
+					<input class="btn btn-primary btn-sm" type="submit" value="Register user">
+				</div>
+			</div>
+
+		</form>
+	</div>
+
+</div>
+</body>
+</html>
