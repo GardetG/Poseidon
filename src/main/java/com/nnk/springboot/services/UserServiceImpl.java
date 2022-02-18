@@ -11,9 +11,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +18,7 @@ import org.springframework.stereotype.Service;
  * Service class implementation for User entity CRUD operations.
  */
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
   private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -82,19 +79,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   public void delete(int id) throws ResourceNotFoundException {
     User userToDelete = getOrThrowException(id);
     userRepository.delete(userToDelete);
-  }
-
-  /**
-   * Return a User by its username in the form of a UserDetails for authentication purpose.
-   *
-   * @param username of the user
-   * @return UserDetail implementation
-   * @throws UsernameNotFoundException when user with this username is not found
-   */
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return userRepository.findByUsername(username)
-        .orElseThrow(() -> new UsernameNotFoundException("Can't login, this user not found"));
   }
 
   private User getOrThrowException(int id) throws ResourceNotFoundException {
