@@ -2,22 +2,26 @@ package com.nnk.springboot.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
  * User entity with credentials, fullName and role.
+ * User implements UserDetails and OAuth2User interface for authentication purpose.
  */
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User implements UserDetails, OAuth2User {
 
   public User() {
   }
@@ -49,6 +53,8 @@ public class User implements UserDetails {
   private String fullName;
   @Column(name = "role")
   private String role;
+  @Transient
+  private Map<String, Object> attributes;
 
   public Integer getId() {
     return id;
@@ -111,10 +117,24 @@ public class User implements UserDetails {
   }
 
   @Override
+  public Map<String, Object> getAttributes() {
+    return attributes;
+  }
+
+  public void setAttributes(Map<String, Object> attributes) {
+    this.attributes = attributes;
+  }
+
+  @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     Collection<GrantedAuthority> authorities = new ArrayList<>();
     authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
     return authorities;
+  }
+
+  @Override
+  public String getName() {
+    return getUsername();
   }
 
 }
