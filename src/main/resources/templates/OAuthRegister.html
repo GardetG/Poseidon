@@ -16,7 +16,7 @@
 		<form action="#" th:action="@{/OAuthRegister/validate}" th:object="${userDto}" method="post" class="form-horizontal" style="width: 100%">
 			<div>
 				<p>You are logged with a third party authentication provider as : <b th:inline="text" class="user"> [[${#httpServletRequest.remoteUser}]] </b></p>
-				<p>You can define a password to easily login with your username and password:</p>
+				<p>You can define a password to easily log in with your username and password:</p>
 			</div>
 			<div class="form-group">
 				<label for="password" class="col-sm-2 control-label">Password</label>
