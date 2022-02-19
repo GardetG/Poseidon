@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `BidList`;
 CREATE TABLE BidList (
   BidListId tinyint(4) NOT NULL AUTO_INCREMENT,
   account VARCHAR(30) NOT NULL,
@@ -25,6 +26,7 @@ CREATE TABLE BidList (
   PRIMARY KEY (BidListId)
 );
 
+DROP TABLE IF EXISTS `Trade`;
 CREATE TABLE Trade (
   TradeId tinyint(4) NOT NULL AUTO_INCREMENT,
   account VARCHAR(30) NOT NULL,
@@ -51,6 +53,7 @@ CREATE TABLE Trade (
   PRIMARY KEY (TradeId)
 );
 
+DROP TABLE IF EXISTS `CurvePoint`;
 CREATE TABLE CurvePoint (
   Id tinyint(4) NOT NULL AUTO_INCREMENT,
   CurveId tinyint,
@@ -62,6 +65,7 @@ CREATE TABLE CurvePoint (
   PRIMARY KEY (Id)
 );
 
+DROP TABLE IF EXISTS `Rating`;
 CREATE TABLE Rating (
   Id tinyint(4) NOT NULL AUTO_INCREMENT,
   moodysRating VARCHAR(125),
@@ -72,6 +76,7 @@ CREATE TABLE Rating (
   PRIMARY KEY (Id)
 );
 
+DROP TABLE IF EXISTS `RuleName`;
 CREATE TABLE RuleName (
   Id tinyint(4) NOT NULL AUTO_INCREMENT,
   name VARCHAR(125),
@@ -84,6 +89,7 @@ CREATE TABLE RuleName (
   PRIMARY KEY (Id)
 );
 
+DROP TABLE IF EXISTS `Users`;
 CREATE TABLE Users (
   Id tinyint(4) NOT NULL AUTO_INCREMENT,
   username VARCHAR(125),
