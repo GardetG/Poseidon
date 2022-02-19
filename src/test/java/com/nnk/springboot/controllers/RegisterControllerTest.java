@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
+import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -114,7 +116,7 @@ class RegisterControllerTest {
 
   @DisplayName("POST invalid DTO on /register/validate should return form view")
   @Test
-  @WithMockUser(username = "admin", roles = "ADMIN")
+  @WithAnonymousUser
   void validateWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/register/validate")
@@ -187,6 +189,31 @@ class RegisterControllerTest {
         .andExpect(view().name("redirect:/bidList/list"));
     verify(userService, times(1)).update(dtoCaptor.capture());
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
+  @DisplayName("POST valid DTO on /OAuthRegister/validate should persist user then return view")
+  @Test
+  @WithMockUser(username="admin", roles = "ADMIN")
+  void updateUserWhenExceptionTest() throws Exception {
+    // GIVEN
+    UserDto expectedDto = new UserDto(1, "Username", "User", "ADMIN");
+    expectedDto.setPassword("PasswdA1=");
+    doThrow(new ResourceNotFoundException("")).when(userService).update(any(UserDto.class));
+
+    // WHEN
+    mockMvc.perform(post("/OAuthRegister/validate")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("id", String.valueOf(expectedDto.getId()))
+            .param("username", expectedDto.getUsername())
+            .param("password", expectedDto.getPassword())
+            .param("fullName", expectedDto.getFullName())
+            .param("role", expectedDto.getRole())
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(view().name("redirect:/"));
+    verify(userService, times(1)).update(any(UserDto.class));
   }
 
   @DisplayName("POST invalid DTO on /OAuthRegister/validate should return from view")

@@ -19,6 +19,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
   public void onAuthenticationSuccess(HttpServletRequest httpServletRequest,
                                       HttpServletResponse httpServletResponse,
                                       Authentication authentication) throws IOException {
+
     User user = (User) authentication.getPrincipal();
     if (user.getPassword() == null) {
       httpServletResponse.sendRedirect("/OAuthRegister");

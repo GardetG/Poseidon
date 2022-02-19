@@ -98,7 +98,7 @@ public class RegisterController {
         userService.update(userDto);
         return "redirect:/bidList/list";
       } catch (Exception e) {
-        throw new IllegalStateException();
+        return "redirect:/";
       }
     }
     LOGGER.info("Failed to register user, form contains errors");
