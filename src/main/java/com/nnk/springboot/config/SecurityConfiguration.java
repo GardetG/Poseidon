@@ -14,6 +14,9 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+/**
+ * Configuration class for Spring Security Authentication and Authorization.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -23,12 +26,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Autowired
   private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
+  /**
+   * Configure AuthenticationManagerBuilder to use userDetailService with passwordEncoder to
+   * authenticate user with persisted credentials in database.
+   *
+   * @param auth AuthenticationManagerBuilder
+   * @throws Exception when Authentication failed
+   */
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(userDetailsService)
         .passwordEncoder(passwordEncoder());
   }
 
+  /**
+   * Configure HttpSecurity filters-chain with authorization by roles, loginform, logout, and
+   * OAuth2.
+   *
+   * @param http HttpSecurity
+   * @throws Exception When Authentication failed
+   */
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http

@@ -32,6 +32,7 @@ public interface UserService {
    * Add a new User from values of the DTO and persist it.
    *
    * @param userDto to create
+   * @throws ResourceAlreadyExistsException when username already used
    */
   void add(UserDto userDto) throws ResourceAlreadyExistsException;
 
@@ -40,6 +41,7 @@ public interface UserService {
    *
    * @param userDto to update
    * @throws ResourceNotFoundException when User not found
+   * @throws ResourceAlreadyExistsException when username already used
    */
   void update(UserDto userDto) throws ResourceNotFoundException, ResourceAlreadyExistsException;
 

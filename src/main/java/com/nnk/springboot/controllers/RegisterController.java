@@ -46,6 +46,7 @@ public class RegisterController {
    *
    * @param userDto of the form
    * @param result  hold validation errors
+   * @param model of the View
    * @return View
    */
   @PostMapping("/register/validate")
@@ -87,6 +88,7 @@ public class RegisterController {
    *
    * @param userDto of the form
    * @param result  hold validation errors
+   * @param model of the view
    * @return View
    */
   @PostMapping("/OAuthRegister/validate")

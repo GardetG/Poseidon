@@ -103,6 +103,7 @@ public class UserController {
    * @param id      of the User to update
    * @param userDto of the form
    * @param result  hold validation errors
+   * @param model of he View
    * @return View
    * @throws ResourceNotFoundException when the requested User not found
    */
