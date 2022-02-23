@@ -49,7 +49,7 @@ public class RatingController {
    */
   @GetMapping("/rating/add")
   public String addRatingForm(RatingDto ratingDto) {
-    LOGGER.info("Request add Rating form");
+    LOGGER.info("Request form to add Rating");
     return "rating/add";
   }
 
@@ -64,7 +64,7 @@ public class RatingController {
    */
   @PostMapping("/rating/validate")
   public String validate(@Valid RatingDto ratingDto, BindingResult result) {
-    LOGGER.info("Request add Rating form validation");
+    LOGGER.info("Request validation on Rating adding");
     if (!result.hasErrors()) {
       ratingService.add(ratingDto);
       LOGGER.info("Rating successfully added");
@@ -85,7 +85,7 @@ public class RatingController {
   @GetMapping("/rating/update/{id}")
   public String showUpdateForm(@PathVariable("id") Integer id, Model model)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update Rating id {} form", id);
+    LOGGER.info("Request form to update Rating id {}", id);
     model.addAttribute("ratingDto", ratingService.findById(id));
     return "rating/update";
   }
@@ -104,7 +104,7 @@ public class RatingController {
   @PostMapping("/rating/update/{id}")
   public String updateRating(@PathVariable("id") Integer id, @Valid RatingDto ratingDto,
                              BindingResult result) throws ResourceNotFoundException {
-    LOGGER.info("Request update Rating id {} form validation", id);
+    LOGGER.info("Request validation on Rating id {} update", id);
     if (!result.hasErrors()) {
       ratingDto.setId(id);
       ratingService.update(ratingDto);

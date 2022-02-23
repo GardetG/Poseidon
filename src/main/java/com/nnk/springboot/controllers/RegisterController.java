@@ -35,6 +35,7 @@ public class RegisterController {
    */
   @GetMapping("/register")
   public String registerUser(UserDto userDto) {
+    LOGGER.info("Request form to register User");
     userDto.setRole("USER");
     return "register";
   }
@@ -51,7 +52,7 @@ public class RegisterController {
    */
   @PostMapping("/register/validate")
   public String register(@Valid UserDto userDto, BindingResult result, Model model) {
-    LOGGER.info("Request register form validation");
+    LOGGER.info("Request validation on user registration");
     if (!result.hasErrors()) {
       try {
         userService.add(userDto);
@@ -77,6 +78,7 @@ public class RegisterController {
     if (user.getPassword() != null) {
       return "redirect:/bidList/list";
     }
+    LOGGER.info("Request form to register OAuth2 user password");
     model.addAttribute("userDto", UserMapper.toDto(user));
     return "OAuthRegister";
   }
@@ -93,17 +95,17 @@ public class RegisterController {
    */
   @PostMapping("/OAuthRegister/validate")
   public String registerValidation(@Valid UserDto userDto, BindingResult result, Model model) {
-    LOGGER.info("Request OAUth2 register form validation");
+    LOGGER.info("Request validation on OAUth2 user password registration");
     if (!result.hasErrors()) {
       try {
-        LOGGER.info("User successfully updated");
+        LOGGER.info("OAuth2 User password successfully registered");
         userService.update(userDto);
         return "redirect:/bidList/list";
       } catch (Exception e) {
         return "redirect:/";
       }
     }
-    LOGGER.info("Failed to register user, form contains errors");
+    LOGGER.info("Failed to register OAuth2 User password, form contains errors");
     return "OAuthRegister";
   }
 

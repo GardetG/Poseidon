@@ -50,7 +50,7 @@ public class UserController {
    */
   @GetMapping("/user/add")
   public String addUser(UserDto userDto) {
-    LOGGER.info("Request add User form");
+    LOGGER.info("Request form to add User");
     return "user/add";
   }
 
@@ -65,7 +65,7 @@ public class UserController {
    */
   @PostMapping("/user/validate")
   public String validate(@Valid UserDto userDto, BindingResult result, Model model) {
-    LOGGER.info("Request add User form validation");
+    LOGGER.info("Request validation on User adding");
     if (!result.hasErrors()) {
       try {
         userService.add(userDto);
@@ -90,7 +90,7 @@ public class UserController {
   @GetMapping("/user/update/{id}")
   public String showUpdateForm(@PathVariable("id") Integer id, Model model)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update User id {} form", id);
+    LOGGER.info("Request form to update User id {}", id);
     model.addAttribute("userDto", userService.findById(id));
     return "user/update";
   }
@@ -110,7 +110,7 @@ public class UserController {
   @PostMapping("/user/update/{id}")
   public String updateUser(@PathVariable("id") Integer id, @Valid UserDto userDto,
                            BindingResult result, Model model) throws ResourceNotFoundException {
-    LOGGER.info("Request update User id {} form validation", id);
+    LOGGER.info("Request validation on User id {} update", id);
     if (!result.hasErrors()) {
       try {
         userDto.setId(id);

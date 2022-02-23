@@ -49,7 +49,7 @@ public class RuleNameController {
    */
   @GetMapping("/ruleName/add")
   public String addRuleForm(RuleNameDto ruleNameDto) {
-    LOGGER.info("Request add RuleName form");
+    LOGGER.info("Request form to add RuleName");
     return "ruleName/add";
   }
 
@@ -64,7 +64,7 @@ public class RuleNameController {
    */
   @PostMapping("/ruleName/validate")
   public String validate(@Valid RuleNameDto ruleNameDto, BindingResult result) {
-    LOGGER.info("Request add RuleName form validation");
+    LOGGER.info("Request validation on RuleName adding");
     if (!result.hasErrors()) {
       ruleNameService.add(ruleNameDto);
       LOGGER.info("RuleName successfully added");
@@ -85,7 +85,7 @@ public class RuleNameController {
   @GetMapping("/ruleName/update/{id}")
   public String showUpdateForm(@PathVariable("id") Integer id, Model model)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update RuleName id {} form", id);
+    LOGGER.info("Request form to update RuleName id {}", id);
     model.addAttribute("ruleNameDto", ruleNameService.findById(id));
     return "ruleName/update";
   }
@@ -104,7 +104,7 @@ public class RuleNameController {
   @PostMapping("/ruleName/update/{id}")
   public String updateRuleName(@PathVariable("id") Integer id, @Valid RuleNameDto ruleNameDto,
                                BindingResult result) throws ResourceNotFoundException {
-    LOGGER.info("Request update RuleName id {} form validation", id);
+    LOGGER.info("Request validation on RuleName id {} update", id);
     if (!result.hasErrors()) {
       ruleNameDto.setId(id);
       ruleNameService.update(ruleNameDto);

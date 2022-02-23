@@ -49,7 +49,7 @@ public class TradeController {
    */
   @GetMapping("/trade/add")
   public String addUser(TradeDto tradeDto) {
-    LOGGER.info("Request add Trade form");
+    LOGGER.info("Request form to add Trade");
     return "trade/add";
   }
 
@@ -64,7 +64,7 @@ public class TradeController {
    */
   @PostMapping("/trade/validate")
   public String validate(@Valid TradeDto tradeDto, BindingResult result) {
-    LOGGER.info("Request add Trade form validation");
+    LOGGER.info("Request validation on Trade adding");
     if (!result.hasErrors()) {
       tradeService.add(tradeDto);
       LOGGER.info("Trade successfully added");
@@ -85,7 +85,7 @@ public class TradeController {
   @GetMapping("/trade/update/{id}")
   public String showUpdateForm(@PathVariable("id") Integer id, Model model)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update Trade id {} form", id);
+    LOGGER.info("Request form to update Trade id {}", id);
     model.addAttribute("tradeDto", tradeService.findById(id));
     return "trade/update";
   }
@@ -104,7 +104,7 @@ public class TradeController {
   @PostMapping("/trade/update/{id}")
   public String updateTrade(@PathVariable("id") Integer id, @Valid TradeDto tradeDto,
                             BindingResult result) throws ResourceNotFoundException {
-    LOGGER.info("Request update Trade id {} form validation", id);
+    LOGGER.info("Request validation on Trade id {} update", id);
     if (!result.hasErrors()) {
       tradeDto.setTradeId(id);
       tradeService.update(tradeDto);
