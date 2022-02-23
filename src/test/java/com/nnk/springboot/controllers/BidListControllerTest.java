@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -19,7 +20,6 @@ import com.nnk.springboot.dto.BidListDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.BidListService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(BidListController.class)
 class BidListControllerTest {
@@ -39,12 +46,30 @@ class BidListControllerTest {
 
   @MockBean
   private BidListService bidListService;
+  @MockBean
+  private UserDetailsService userDetailsService;
+  @MockBean
+  private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
   @Captor
   private ArgumentCaptor<BidListDto> dtoCaptor;
 
+
+  @DisplayName("GET /bidList/list when not authenticate should redirect to login")
+  @Test
+  @WithAnonymousUser
+  void homeWhenNotAuthenticateTest() throws Exception {
+    // WHEN
+    ResultActions response = mockMvc.perform(get("/bidList/list"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(redirectedUrl("http://localhost/login"));
+  }
+  
   @DisplayName("GET /bidList/list should return view with list of BidList as attribute")
   @Test
+  @WithMockUser(username="user")
   void homeTest() throws Exception {
     // GIVEN
     List<BidListDto> DtoList = new ArrayList<>();
@@ -62,24 +87,9 @@ class BidListControllerTest {
         .andExpect(model().attribute("bidLists", DtoList));
   }
 
-  @DisplayName("GET /bidList/list with no BidList in database should return view with empty list as attribute")
-  @Test
-  void homeWhenEmptyTest() throws Exception {
-    // GIVEN
-    when(bidListService.findAll()).thenReturn(Collections.emptyList());
-
-    // WHEN
-    mockMvc.perform(get("/bidList/list"))
-
-    // THEN
-        .andExpect(status().isOk())
-        .andExpect(view().name("bidList/list"))
-        .andExpect(model().attributeExists("bidLists"))
-        .andExpect(model().attribute("bidLists", Collections.emptyList()));
-  }
-
   @DisplayName("GET /bidList/add should return view")
   @Test
+  @WithMockUser(username="user")
   void addBidFormTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/bidList/add"))
@@ -91,6 +101,7 @@ class BidListControllerTest {
 
   @DisplayName("POST valid DTO on /bidList/validate should persist BidList then return view")
   @Test
+  @WithMockUser(username="user")
   void validateTest() throws Exception {
     // GIVEN
     BidListDto expectedDto = new BidListDto(null,"Account Test","Type Test", 10d);
@@ -112,6 +123,7 @@ class BidListControllerTest {
 
   @DisplayName("POST invalid DTO on /bidList/validate should return form view")
   @Test
+  @WithMockUser(username="user")
   void validateWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/bidList/validate")
@@ -132,6 +144,7 @@ class BidListControllerTest {
 
   @DisplayName("GET /bidList/update should return view")
   @Test
+  @WithMockUser(username="user")
   void showUpdateFormTest() throws Exception {
     // GIVEN
     BidListDto bidListDto = new BidListDto(1,"Account Test","Type Test",10d);
@@ -150,6 +163,7 @@ class BidListControllerTest {
 
   @DisplayName("GET /bidList/update when BidList not found should return view with error message")
   @Test
+  @WithMockUser(username="user")
   void showUpdateFormWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This bidList is not found")).when(bidListService).findById(anyInt());
@@ -166,6 +180,7 @@ class BidListControllerTest {
 
   @DisplayName("POST valid DTO on /bidList/update should persist BidList then return view")
   @Test
+  @WithMockUser(username="user")
   void updateBidTest() throws Exception {
     // GIVEN
     BidListDto expectedDto = new BidListDto(1,"Update Account Test","Update Type Test", 10d);
@@ -187,6 +202,7 @@ class BidListControllerTest {
 
   @DisplayName("POST invalid DTO on /bidList/update should return from view")
   @Test
+  @WithMockUser(username="user")
   void updateBidWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/bidList/update/1")
@@ -207,6 +223,7 @@ class BidListControllerTest {
 
   @DisplayName("POST DTO on /bidList/update when BidList not found should return view with error message")
   @Test
+  @WithMockUser(username="user")
   void updateBidWhenNotFoundTest() throws Exception {
     // GIVEN
     BidListDto expectedDto = new BidListDto(9,"Update Account Test","Update Type Test", 10d);
@@ -230,6 +247,7 @@ class BidListControllerTest {
 
   @DisplayName("GET /bidList/delete should delete bidList then return view")
   @Test
+  @WithMockUser(username="user")
   void deleteBidTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/bidList/delete/1"))
@@ -242,6 +260,7 @@ class BidListControllerTest {
 
   @DisplayName("GET /bidList/delete when BidList not found should return view with error message")
   @Test
+  @WithMockUser(username="user")
   void deleteBidWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This bidList is not found")).when(bidListService).delete(anyInt());
@@ -255,4 +274,5 @@ class BidListControllerTest {
         .andExpect(flash().attributeExists("error"));
     verify(bidListService, times(1)).delete(9);
   }
+
 }

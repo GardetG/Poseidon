@@ -49,7 +49,7 @@ public class BidListController {
    */
   @GetMapping("/bidList/add")
   public String addBidForm(BidListDto bidListDto) {
-    LOGGER.info("Request add BidList form");
+    LOGGER.info("Request form to add BidList");
     return "bidList/add";
   }
 
@@ -64,7 +64,7 @@ public class BidListController {
    */
   @PostMapping("/bidList/validate")
   public String validate(@Valid BidListDto bidListDto, BindingResult result) {
-    LOGGER.info("Request add BidList form validation");
+    LOGGER.info("Request validation on BidList adding");
     if (!result.hasErrors()) {
       bidListService.add(bidListDto);
       LOGGER.info("BidList successfully added");
@@ -85,7 +85,7 @@ public class BidListController {
   @GetMapping("/bidList/update/{id}")
   public String showUpdateForm(@PathVariable("id") Integer id, Model model)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update BidList id {} form", id);
+    LOGGER.info("Request form to update BidList id {}", id);
     model.addAttribute("bidListDto", bidListService.findById(id));
     return "bidList/update";
   }
@@ -105,7 +105,7 @@ public class BidListController {
   public String updateBid(@PathVariable("id") Integer id, @Valid BidListDto bidListDto,
                           BindingResult result)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update BidList id {} form validation", id);
+    LOGGER.info("Request validation on BidList id {} update", id);
     if (!result.hasErrors()) {
       bidListDto.setBidListId(id);
       bidListService.update(bidListDto);

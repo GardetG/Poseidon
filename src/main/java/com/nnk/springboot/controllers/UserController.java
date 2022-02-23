@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.UserService;
 import javax.validation.Valid;
@@ -49,7 +50,7 @@ public class UserController {
    */
   @GetMapping("/user/add")
   public String addUser(UserDto userDto) {
-    LOGGER.info("Request add User form");
+    LOGGER.info("Request form to add User");
     return "user/add";
   }
 
@@ -63,12 +64,16 @@ public class UserController {
    * @return View
    */
   @PostMapping("/user/validate")
-  public String validate(@Valid UserDto userDto, BindingResult result) {
-    LOGGER.info("Request add User form validation");
+  public String validate(@Valid UserDto userDto, BindingResult result, Model model) {
+    LOGGER.info("Request validation on User adding");
     if (!result.hasErrors()) {
-      userService.add(userDto);
-      LOGGER.info("User successfully added");
-      return "redirect:/user/list";
+      try {
+        userService.add(userDto);
+        LOGGER.info("User successfully added");
+        return "redirect:/user/list";
+      } catch (ResourceAlreadyExistsException e) {
+        model.addAttribute("error", e.getMessage());
+      }
     }
     LOGGER.info("Failed to add User, form contains errors");
     return "user/add";
@@ -85,7 +90,7 @@ public class UserController {
   @GetMapping("/user/update/{id}")
   public String showUpdateForm(@PathVariable("id") Integer id, Model model)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update User id {} form", id);
+    LOGGER.info("Request form to update User id {}", id);
     model.addAttribute("userDto", userService.findById(id));
     return "user/update";
   }
@@ -98,21 +103,26 @@ public class UserController {
    * @param id      of the User to update
    * @param userDto of the form
    * @param result  hold validation errors
+   * @param model of he View
    * @return View
    * @throws ResourceNotFoundException when the requested User not found
    */
   @PostMapping("/user/update/{id}")
   public String updateUser(@PathVariable("id") Integer id, @Valid UserDto userDto,
-                           BindingResult result) throws ResourceNotFoundException {
-    LOGGER.info("Request update User id {} form validation", id);
-    if (result.hasErrors()) {
-      LOGGER.info("Failed to update User id {}, form contains errors", id);
-      return "user/update";
+                           BindingResult result, Model model) throws ResourceNotFoundException {
+    LOGGER.info("Request validation on User id {} update", id);
+    if (!result.hasErrors()) {
+      try {
+        userDto.setId(id);
+        userService.update(userDto);
+        LOGGER.info("User id {} successfully updated", id);
+        return "redirect:/user/list";
+      } catch (ResourceAlreadyExistsException e) {
+        model.addAttribute("error", e.getMessage());
+      }
     }
-    userDto.setId(id);
-    userService.update(userDto);
-    LOGGER.info("User id {} successfully updated", id);
-    return "redirect:/user/list";
+    LOGGER.info("Failed to update User id {}, form contains errors", id);
+    return "user/update";
   }
 
   /**

@@ -15,18 +15,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@WithMockUser(username = "Admin", roles = "ADMIN")
 class UserIntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;
 
-  @DisplayName("User access and fill add User form to add new user")
+  @DisplayName("Admin access and fill add User form to add new user")
   @Test
   void addUserIntegrationTest() throws Exception {
     // GIVEN a user requesting the add User form
@@ -64,7 +66,7 @@ class UserIntegrationTest {
         .andExpect(content().string(containsString("<td style=\"width: 10%\">3</td>")));
   }
 
-  @DisplayName("User access and fill update User form to update existing user")
+  @DisplayName("Admin access and fill update User form to update existing user")
   @Test
   void updateUserIntegrationTest() throws Exception {
     // GIVEN a user requesting the update User form for User 1
@@ -104,7 +106,7 @@ class UserIntegrationTest {
         .andExpect(content().string(containsString("<td style=\"width: 10%\">1</td>")));
   }
 
-  @DisplayName("User request User deletion")
+  @DisplayName("Admin request User deletion")
   @Test
   void deleteUserIntegrationTest() throws Exception {
     // GIVEN a user requesting deletion of User 2

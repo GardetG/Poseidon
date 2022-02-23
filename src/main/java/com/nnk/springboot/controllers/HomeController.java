@@ -1,23 +1,22 @@
 package com.nnk.springboot.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * Controller class for displaying home page view.
+ */
 @Controller
-public class HomeController
-{
-	@RequestMapping("/")
-	public String home(Model model)
-	{
-		return "home";
-	}
+public class HomeController {
 
-	@RequestMapping("/admin/home")
-	public String adminHome(Model model)
-	{
-		return "redirect:/bidList/list";
-	}
+  private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
 
+  @RequestMapping("/")
+  public String home() {
+    LOGGER.info("Request HomePage");
+    return "home";
+  }
 
 }

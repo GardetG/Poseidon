@@ -12,14 +12,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.UserService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(UserController.class)
@@ -39,12 +46,40 @@ class UserControllerTest {
 
   @MockBean
   private UserService userService;
+  @MockBean
+  private UserDetailsService userDetailsService;
+  @MockBean
+  private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
   @Captor
   private ArgumentCaptor<UserDto> dtoCaptor;
 
+  @DisplayName("GET /user/list when not authenticate should redirect to login")
+  @Test
+  @WithAnonymousUser
+  void homeWhenNotAuthenticateTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/user/list"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(redirectedUrl("http://localhost/login"));
+  }
+
+  @DisplayName("GET /user/list when authenticate as user should allow access")
+  @Test
+  @WithMockUser(username="user", roles = "USER")
+  void homeWhenAuthenticateAsUserTest() throws Exception {
+    // WHEN
+    mockMvc.perform(get("/user/list"))
+
+        // THEN
+        .andExpect(status().isForbidden());
+  }
+
   @DisplayName("GET /user/list should return view with list of User as attribute")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN")
   void homeTest() throws Exception {
     // GIVEN
     List<UserDto> DtoList = new ArrayList<>();
@@ -63,24 +98,9 @@ class UserControllerTest {
     assertThat(DtoList).extracting("password").containsOnlyNulls();
   }
 
-  @DisplayName("GET /user/list with no User in database should return view with empty list as attribute")
-  @Test
-  void homeWhenEmptyTest() throws Exception {
-    // GIVEN
-    when(userService.findAll()).thenReturn(Collections.emptyList());
-
-    // WHEN
-    mockMvc.perform(get("/user/list"))
-
-        // THEN
-        .andExpect(status().isOk())
-        .andExpect(view().name("user/list"))
-        .andExpect(model().attributeExists("users"))
-        .andExpect(model().attribute("users", Collections.emptyList()));
-  }
-
   @DisplayName("GET /user/add should return view")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void addUserFormTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/user/add"))
@@ -92,6 +112,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/validate should persist User then return view")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void validateTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(null, "Username 1", "User 1", "USER");
@@ -113,8 +134,35 @@ class UserControllerTest {
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
 
+  @DisplayName("POST valid DTO on /user/validate when username already existed should return from view with error message")
+  @Test
+  @WithMockUser(username="admin", roles = "ADMIN")
+  void validateWhenUsernameAlreadyExistsTest() throws Exception {
+    // GIVEN
+    UserDto expectedDto = new UserDto(null, "ExistingUsername", "User 1", "USER");
+    expectedDto.setPassword("PasswdA1=");
+    doThrow(new ResourceAlreadyExistsException("This username is already used")).when(userService).add(any(UserDto.class));
+
+    // WHEN
+    mockMvc.perform(post("/user/validate")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", expectedDto.getUsername())
+            .param("password", expectedDto.getPassword())
+            .param("fullName", expectedDto.getFullName())
+            .param("role", expectedDto.getRole())
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("user/add"))
+        .andExpect(model().attributeExists("error"));
+    verify(userService, times(1)).add(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
   @DisplayName("POST invalid DTO on /user/validate should return form view")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void validateWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/user/validate")
@@ -138,6 +186,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/update should return view")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void showUpdateFormTest() throws Exception {
     // GIVEN
     UserDto userDto = new UserDto(1, "Username 1", "User 1", "USER");
@@ -157,6 +206,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/update when user not found should return view with error message")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void showUpdateFormWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This user is not found")).when(userService).findById(anyInt());
@@ -173,6 +223,7 @@ class UserControllerTest {
 
   @DisplayName("POST valid DTO on /user/update should persist user then return view")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void updateUserTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(1, "Update Username", "Update User", "ADMIN");
@@ -194,8 +245,35 @@ class UserControllerTest {
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
 
+  @DisplayName("POST valid DTO on /user/update when username already existed should return from view with error message")
+  @Test
+  @WithMockUser(username="admin", roles = "ADMIN")
+  void updateWhenUsernameAlreadyExistsTest() throws Exception {
+    // GIVEN
+    UserDto expectedDto = new UserDto(1, "Update ExistingUsername", "Update User", "ADMIN");
+    expectedDto.setPassword("UpdatePasswdA1=");
+    doThrow(new ResourceAlreadyExistsException("This username is already used")).when(userService).update(any(UserDto.class));
+
+    // WHEN
+    mockMvc.perform(post("/user/update/1")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", expectedDto.getUsername())
+            .param("password", expectedDto.getPassword())
+            .param("fullName", expectedDto.getFullName())
+            .param("role", expectedDto.getRole())
+            .with(csrf()))
+
+        // THEN
+        .andExpect(status().isOk())
+        .andExpect(view().name("user/update"))
+        .andExpect(model().attributeExists("error"));
+    verify(userService, times(1)).update(dtoCaptor.capture());
+    assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
+  }
+
   @DisplayName("POST invalid DTO on /user/update should return from view")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void updateUserWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/user/update/1")
@@ -219,6 +297,7 @@ class UserControllerTest {
 
   @DisplayName("POST DTO on /user/update when user not found should return view with error message")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void updateUserWhenNotFoundTest() throws Exception {
     // GIVEN
     UserDto expectedDto = new UserDto(9, "Update Username", "Update User", "ADMIN");
@@ -241,9 +320,10 @@ class UserControllerTest {
     verify(userService, times(1)).update(dtoCaptor.capture());
     assertThat(dtoCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedDto);
   }
-  
+
   @DisplayName("GET /user/delete should delete User then return view")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void deleteUserTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/user/delete/1"))
@@ -256,6 +336,7 @@ class UserControllerTest {
 
   @DisplayName("GET /user/delete when User not found should return view with error message")
   @Test
+  @WithMockUser(username="admin", roles = "ADMIN") 
   void deleteUserWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This User is not found")).when(userService).delete(anyInt());

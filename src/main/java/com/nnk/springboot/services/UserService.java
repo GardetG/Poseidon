@@ -1,6 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -31,16 +32,18 @@ public interface UserService {
    * Add a new User from values of the DTO and persist it.
    *
    * @param userDto to create
+   * @throws ResourceAlreadyExistsException when username already used
    */
-  void add(UserDto userDto);
+  void add(UserDto userDto) throws ResourceAlreadyExistsException;
 
   /**
    * Update a User with value from the DTO and persist it.
    *
    * @param userDto to update
    * @throws ResourceNotFoundException when User not found
+   * @throws ResourceAlreadyExistsException when username already used
    */
-  void update(UserDto userDto) throws ResourceNotFoundException;
+  void update(UserDto userDto) throws ResourceNotFoundException, ResourceAlreadyExistsException;
 
   /**
    * Delete a persisted User by Id.

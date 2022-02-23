@@ -2,6 +2,7 @@ package com.nnk.springboot.services;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
+import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.utils.UserMapper;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,10 +21,12 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
-  private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private PasswordEncoder encoder;
 
   /**
    * {@inheritDoc}
@@ -48,7 +51,8 @@ public class UserServiceImpl implements UserService {
    * {@inheritDoc}
    */
   @Override
-  public void add(UserDto userDto) {
+  public void add(UserDto userDto) throws ResourceAlreadyExistsException {
+    checkUsernameUnique(userDto.getUsername());
     User userToAdd = new User();
     UserMapper.toEntity(userToAdd, userDto);
     userToAdd.setPassword(encoder.encode(userToAdd.getPassword()));
@@ -59,8 +63,12 @@ public class UserServiceImpl implements UserService {
    * {@inheritDoc}
    */
   @Override
-  public void update(UserDto userDto) throws ResourceNotFoundException {
+  public void update(UserDto userDto)
+      throws ResourceNotFoundException, ResourceAlreadyExistsException {
     User userToUpdate = getOrThrowException(userDto.getId());
+    if (!userDto.getUsername().equals(userToUpdate.getUsername())) {
+      checkUsernameUnique(userDto.getUsername());
+    }
     UserMapper.toEntity(userToUpdate, userDto);
     userToUpdate.setPassword(encoder.encode(userToUpdate.getPassword()));
     userRepository.save(userToUpdate);
@@ -81,6 +89,13 @@ public class UserServiceImpl implements UserService {
           LOGGER.error("The User with id {} is not found", id);
           return new ResourceNotFoundException("This user is not found");
         });
+  }
+
+  private void checkUsernameUnique(String username) throws ResourceAlreadyExistsException {
+    if (userRepository.existsByUsername(username)) {
+      LOGGER.error("The username {} is already used", username);
+      throw new ResourceAlreadyExistsException("This username is already used");
+    }
   }
 
 }

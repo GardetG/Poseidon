@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -19,7 +20,6 @@ import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.services.RatingService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(RatingController.class)
 class RatingControllerTest {
@@ -39,12 +46,29 @@ class RatingControllerTest {
   
   @MockBean
   private RatingService ratingService;
+  @MockBean
+  private UserDetailsService userDetailsService;
+  @MockBean
+  private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
   @Captor
   private ArgumentCaptor<RatingDto> dtoCaptor;
 
+  @DisplayName("GET /rating/list when not authenticate should redirect to login")
+  @Test
+  @WithAnonymousUser
+  void homeWhenNotAuthenticateTest() throws Exception {
+    // WHEN
+    ResultActions response = mockMvc.perform(get("/rating/list"))
+
+        // THEN
+        .andExpect(status().isFound())
+        .andExpect(redirectedUrl("http://localhost/login"));
+  }
+  
   @DisplayName("GET /rating/list should return view with list of Rating as attribute")
   @Test
+  @WithMockUser(username="user")
   void homeTest() throws Exception {
     // GIVEN
     List<RatingDto> DtoList = new ArrayList<>();
@@ -62,24 +86,9 @@ class RatingControllerTest {
         .andExpect(model().attribute("ratings", DtoList));
   }
 
-  @DisplayName("GET /rating/list with no Rating in database should return view with empty list as attribute")
-  @Test
-  void homeWhenEmptyTest() throws Exception {
-    // GIVEN
-    when(ratingService.findAll()).thenReturn(Collections.emptyList());
-
-    // WHEN
-    mockMvc.perform(get("/rating/list"))
-
-        // THEN
-        .andExpect(status().isOk())
-        .andExpect(view().name("rating/list"))
-        .andExpect(model().attributeExists("ratings"))
-        .andExpect(model().attribute("ratings", Collections.emptyList()));
-  }
-
   @DisplayName("GET /rating/add should return view")
   @Test
+  @WithMockUser(username="user") 
   void addRatingFormTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/rating/add"))
@@ -91,6 +100,7 @@ class RatingControllerTest {
 
   @DisplayName("POST valid DTO on /rating/validate should persist Rating then return view")
   @Test
+  @WithMockUser(username="user") 
   void validateTest() throws Exception {
     // GIVEN
     RatingDto expectedDto = new RatingDto(null, "Moody's Rating 1", "S&P Rating 1", "Fitch Rating 1", 10);
@@ -113,6 +123,7 @@ class RatingControllerTest {
 
   @DisplayName("POST invalid DTO on /rating/validate should return form view")
   @Test
+  @WithMockUser(username="user") 
   void validateWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/rating/validate")
@@ -135,6 +146,7 @@ class RatingControllerTest {
 
   @DisplayName("GET /rating/update should return view")
   @Test
+  @WithMockUser(username="user") 
   void showUpdateFormTest() throws Exception {
     // GIVEN
     RatingDto ratingDto = new RatingDto(1, "Moody's Rating 1", "S&P Rating 1", "Fitch Rating 1", 10);
@@ -153,6 +165,7 @@ class RatingControllerTest {
 
   @DisplayName("GET /rating/update when rating not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void showUpdateFormWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This rating is not found")).when(ratingService).findById(anyInt());
@@ -169,6 +182,7 @@ class RatingControllerTest {
 
   @DisplayName("POST valid DTO on /rating/update should persist rating then return view")
   @Test
+  @WithMockUser(username="user") 
   void updateRatingTest() throws Exception {
     // GIVEN
     RatingDto expectedDto = new RatingDto(1, "Update Moody's Rating", "Update S&P Rating", "Update Fitch Rating", 11);
@@ -191,6 +205,7 @@ class RatingControllerTest {
 
   @DisplayName("POST invalid DTO on /rating/update should return from view")
   @Test
+  @WithMockUser(username="user") 
   void updateRatingWhenInvalidTest() throws Exception {
     // WHEN
     mockMvc.perform(post("/rating/update/1")
@@ -213,6 +228,7 @@ class RatingControllerTest {
 
   @DisplayName("POST DTO on /rating/update when rating not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void updateRatingWhenNotFoundTest() throws Exception {
     // GIVEN
     RatingDto expectedDto = new RatingDto(9, "Update Moody's Rating", "Update S&P Rating", "Update Fitch Rating", 11);
@@ -237,6 +253,7 @@ class RatingControllerTest {
 
   @DisplayName("GET /rating/delete should delete Rating then return view")
   @Test
+  @WithMockUser(username="user") 
   void deleteRatingTest() throws Exception {
     // WHEN
     mockMvc.perform(get("/rating/delete/1"))
@@ -249,6 +266,7 @@ class RatingControllerTest {
 
   @DisplayName("GET /Rating/delete when Rating not found should return view with error message")
   @Test
+  @WithMockUser(username="user") 
   void deleteRatingWhenNotFoundTest() throws Exception {
     // GIVEN
     doThrow(new ResourceNotFoundException("This Rating is not found")).when(ratingService).delete(anyInt());

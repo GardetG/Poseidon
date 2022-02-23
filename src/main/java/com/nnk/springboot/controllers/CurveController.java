@@ -49,7 +49,7 @@ public class CurveController {
    */
   @GetMapping("/curvePoint/add")
   public String addCurveForm(CurvePointDto curvePointDto) {
-    LOGGER.info("Request add CurvePoint form");
+    LOGGER.info("Request form to add CurvePoint");
     return "curvePoint/add";
   }
 
@@ -64,7 +64,7 @@ public class CurveController {
    */
   @PostMapping("/curvePoint/validate")
   public String validate(@Valid CurvePointDto curvePointDto, BindingResult result) {
-    LOGGER.info("Request add CurvePoint form validation");
+    LOGGER.info("Request validation on CurvePoint adding");
     if (!result.hasErrors()) {
       curvePointService.add(curvePointDto);
       LOGGER.info("CurvePoint successfully added");
@@ -85,7 +85,7 @@ public class CurveController {
   @GetMapping("/curvePoint/update/{id}")
   public String showUpdateForm(@PathVariable("id") Integer id, Model model)
       throws ResourceNotFoundException {
-    LOGGER.info("Request update CurvePoint id {} form", id);
+    LOGGER.info("Request form to update CurvePoint id {}", id);
     model.addAttribute("curvePointDto", curvePointService.findById(id));
     return "curvePoint/update";
   }
@@ -104,7 +104,7 @@ public class CurveController {
   @PostMapping("/curvePoint/update/{id}")
   public String updateCurve(@PathVariable("id") Integer id, @Valid CurvePointDto curvePointDto,
                             BindingResult result) throws ResourceNotFoundException {
-    LOGGER.info("Request update CurvePoint id {} form validation", id);
+    LOGGER.info("Request validation on CurvePoint id {} update", id);
     if (!result.hasErrors()) {
       curvePointDto.setId(id);
       curvePointService.update(curvePointDto);

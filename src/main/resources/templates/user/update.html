@@ -14,6 +14,9 @@
 	</div>
 
 	<div class="row">
+		<div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
+	</div>
+	<div class="row">
 		<form action="#" th:action="@{/user/update/{id}(id=${userDto.id})}" th:object="${userDto}" method="post" class="form-horizontal" style="width: 100%">
 			<div class="form-group">
 				<label for="fullName" class="col-sm-2 control-label">Full Name</label>
