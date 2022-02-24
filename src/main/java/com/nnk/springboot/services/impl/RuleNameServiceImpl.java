@@ -1,9 +1,10 @@
-package com.nnk.springboot.services;
+package com.nnk.springboot.services.impl;
 
 import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.dto.RuleNameDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.RuleNameRepository;
+import com.nnk.springboot.services.RuleNameService;
 import com.nnk.springboot.utils.RuleNameMapper;
 import java.util.List;
 import java.util.stream.Collectors;

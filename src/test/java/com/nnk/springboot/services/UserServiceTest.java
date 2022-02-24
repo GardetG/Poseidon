@@ -14,6 +14,7 @@ import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
+import com.nnk.springboot.services.impl.UserServiceImpl;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

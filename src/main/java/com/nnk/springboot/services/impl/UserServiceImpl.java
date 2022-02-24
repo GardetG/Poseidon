@@ -1,10 +1,11 @@
-package com.nnk.springboot.services;
+package com.nnk.springboot.services.impl;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.dto.UserDto;
 import com.nnk.springboot.exceptions.ResourceAlreadyExistsException;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.UserRepository;
+import com.nnk.springboot.services.UserService;
 import com.nnk.springboot.utils.UserMapper;
 import java.util.List;
 import java.util.stream.Collectors;

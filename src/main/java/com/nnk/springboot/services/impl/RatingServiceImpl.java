@@ -1,9 +1,10 @@
-package com.nnk.springboot.services;
+package com.nnk.springboot.services.impl;
 
 import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.dto.RatingDto;
 import com.nnk.springboot.exceptions.ResourceNotFoundException;
 import com.nnk.springboot.repositories.RatingRepository;
+import com.nnk.springboot.services.RatingService;
 import com.nnk.springboot.utils.RatingMapper;
 import java.util.List;
 import java.util.stream.Collectors;
