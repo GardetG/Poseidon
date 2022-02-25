@@ -60,7 +60,7 @@ class CurvePointIntegrationTest {
     // THEN
         .andExpect(status().isOk())
         .andExpect(view().name("curvePoint/list"))
-        .andExpect(content().string(containsString("12")))
+        .andExpect(content().string(containsString("<td>12</td>")))
         .andExpect(content().string(containsString("20.0")))
         .andExpect(content().string(containsString("40.0")));
   }
@@ -76,7 +76,7 @@ class CurvePointIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(view().name("curvePoint/update"))
         .andExpect(content().string(containsString("Update CurvePoint")))
-        .andExpect(content().string(containsString("10")))
+        .andExpect(content().string(containsString("value=\"10\"")))
         .andExpect(content().string(containsString("10.0")))
         .andExpect(content().string(containsString("20.0")));
 
@@ -100,7 +100,7 @@ class CurvePointIntegrationTest {
     // THEN
         .andExpect(status().isOk())
         .andExpect(view().name("curvePoint/list"))
-        .andExpect(content().string(containsString("13")))
+        .andExpect(content().string(containsString("<td>13</td>")))
         .andExpect(content().string(containsString("25.0")))
         .andExpect(content().string(containsString("50.0")));
   }
@@ -124,7 +124,7 @@ class CurvePointIntegrationTest {
     // THEN
         .andExpect(status().isOk())
         .andExpect(view().name("curvePoint/list"))
-        .andExpect(content().string(not(containsString("11"))))
+        .andExpect(content().string(not(containsString("<td>11</td>"))))
         .andExpect(content().string(not(containsString("15.0"))))
         .andExpect(content().string(not(containsString("30.0"))));
   }

@@ -81,7 +81,7 @@ class RatingIntegrationTest {
         .andExpect(content().string(containsString("Moody Rating Test")))
         .andExpect(content().string(containsString("S&amp;P Rating Test")))
         .andExpect(content().string(containsString("Fitch Rating Test")))
-        .andExpect(content().string(containsString("10")));
+        .andExpect(content().string(containsString("value=\"10\"")));
 
     // GIVEN a user validating the form after filling it
     // WHEN
@@ -107,7 +107,7 @@ class RatingIntegrationTest {
         .andExpect(content().string(containsString("Update Moody Rating")))
         .andExpect(content().string(containsString("Update S&amp;P Rating")))
         .andExpect(content().string(containsString("Update Fitch Rating")))
-        .andExpect(content().string(containsString("13")));
+        .andExpect(content().string(containsString("<td style=\"width: 25%\">13</td>")));
   }
 
   @DisplayName("User request Rating deletion")
@@ -132,7 +132,7 @@ class RatingIntegrationTest {
         .andExpect(content().string(not(containsString("Moody Rating to delete Test"))))
         .andExpect(content().string(not(containsString("S&amp;P Rating to delete Test"))))
         .andExpect(content().string(not(containsString("Fitch Rating to delete Test"))))
-        .andExpect(content().string(not(containsString("11"))));
+        .andExpect(content().string(not(containsString("<td style=\"width: 25%\">11</td>"))));
   }
 
 }
